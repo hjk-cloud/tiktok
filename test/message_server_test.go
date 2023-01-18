@@ -3,7 +3,7 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RaymondCode/simple-demo/controller"
+	"github.com/hjk-cloud/tiktok/controller"
 	"io"
 	"net"
 	"testing"

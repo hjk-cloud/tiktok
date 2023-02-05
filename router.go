@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hjk-cloud/tiktok/controller"
 	"github.com/gin-gonic/gin"
+	"github.com/hjk-cloud/tiktok/controller"
 )
 
 func initRouter(r *gin.Engine) {
@@ -30,6 +30,6 @@ func initRouter(r *gin.Engine) {
 	apiRouter.GET("/relation/follow/list/", controller.FollowList)
 	apiRouter.GET("/relation/follower/list/", controller.FollowerList)
 	apiRouter.GET("/relation/friend/list/", controller.FriendList)
-	apiRouter.GET("/message/chat/", controller.MessageChat)
-	apiRouter.POST("/message/action/", controller.MessageAction)
+	//apiRouter.GET("/message/chat/", controller.MessageChat)
+	//apiRouter.POST("/message/action/", controller.MessageAction)
 }

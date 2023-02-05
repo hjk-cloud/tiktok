@@ -21,3 +21,5 @@
 go.work
 
 .idea
+# 配置文件，含有数据库登录信息等
+configs

@@ -3,11 +3,12 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hjk-cloud/tiktok/controller"
 	"io"
 	"net"
 	"testing"
 	"time"
+
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/flow"
 )
 
 func TestMessageServer(t *testing.T) {
@@ -46,7 +47,7 @@ func readMessage(conn net.Conn) {
 			continue
 		}
 
-		var event = controller.MessagePushEvent{}
+		var event = flow.MessagePushEvent{}
 		_ = json.Unmarshal(buf[:n], &event)
 		fmt.Printf("Read message：%+v\n", event)
 	}
@@ -57,7 +58,7 @@ func sendMessage(fromUserId int, toUserId int, fromConn net.Conn) {
 
 	for i := 0; i < 3; i++ {
 		time.Sleep(time.Second)
-		sendEvent := controller.MessageSendEvent{
+		sendEvent := flow.MessageSendEvent{
 			UserId:     int64(fromUserId),
 			ToUserId:   int64(toUserId),
 			MsgContent: "Test Content",
@@ -73,11 +74,11 @@ func sendMessage(fromUserId int, toUserId int, fromConn net.Conn) {
 }
 
 func createChat(userIdA int, connA net.Conn, userIdB int, connB net.Conn) {
-	chatEventA := controller.MessageSendEvent{
+	chatEventA := flow.MessageSendEvent{
 		UserId:   int64(userIdA),
 		ToUserId: int64(userIdB),
 	}
-	chatEventB := controller.MessageSendEvent{
+	chatEventB := flow.MessageSendEvent{
 		UserId:   int64(userIdB),
 		ToUserId: int64(userIdA),
 	}

@@ -1,7 +1,8 @@
-package dao
+package repository
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"database/sql"
@@ -10,21 +11,50 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-type Video entity.Video
+// TableName why？
+// type Video entity.Video
 
-var db *sql.DB
+// type Video struct {
+// 	entity.Video
+// }
 
-func NewDB() *sql.DB {
+var (
+	connLink string
+	db       *sql.DB
+	gdb      *gorm.DB
+)
+
+func getConfig() {
 	host := viper.GetString("mysql.host")
 	port := viper.GetString("mysql.port")
 	user := viper.GetString("mysql.user")
 	pwd := viper.GetString("mysql.pwd")
 	dbname := viper.GetString("mysql.dbname")
-	connLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local", user, pwd, host, port, dbname)
+	connLink = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local", user, pwd, host, port, dbname)
+}
 
-	DB, _ := sql.Open("mysql", connLink) // config.DB_LINK) //"root:root@tcp(127.0.0.1:3306)/tiktok"
+func NewGormDB() *gorm.DB {
+	getConfig()
+	log.Println("#####", connLink)
+	db, err := gorm.Open(mysql.Open(connLink))
+	if err != nil {
+		log.Panicln(err)
+		// panic(err)
+	}
+	return db
+}
+
+func NewDB() *sql.DB {
+	getConfig()
+	DB, err := sql.Open("mysql", connLink) // config.DB_LINK) //"root:root@tcp(127.0.0.1:3306)/tiktok"
+	if err != nil {
+		log.Println(err)
+		// panic(err)
+	}
 	//设置数据库最大连接数
 	DB.SetConnMaxLifetime(100)
 	//设置上数据库最大闲置连接数
@@ -52,7 +82,7 @@ func NewVideoRepoInstance() *VideoRepo {
 	return videoRepo
 }
 
-func (*VideoRepo) Create(video *Video) (int64, error) {
+func (*VideoRepo) Create(video *(entity.Video)) (int64, error) {
 	db = NewDB()
 
 	sqlStr := "INSERT INTO t_video (`author_id`, `title`, `play_url`, `cover_url`, `favorite_count`, `comment_count`, `status`, `hash`, `create_time`)" +
@@ -71,4 +101,12 @@ func (*VideoRepo) Create(video *Video) (int64, error) {
 	fmt.Printf("insert success, the id is %d.\n", newId)
 
 	return newId, nil
+}
+
+// 奇怪
+func (*VideoRepo) CreateByGorm(video *(entity.Video)) (int64, error) {
+	fmt.Println("#####", video.TableName())
+	gdb = NewGormDB()
+	gdb.Create(video)
+	return video.Id, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -24,7 +25,7 @@ import (
 	"encoding/hex"
 )
 
-type Video entity.Video
+// type Video entity.Video
 type PublishActionFlow flow.PublishActionFlow
 
 func PublishAction(c *gin.Context, p *param.PublishActionParam) (int64, error) {
@@ -36,7 +37,7 @@ func NewPublishActionFlow(c *gin.Context, p *param.PublishActionParam) *PublishA
 }
 
 func (f *PublishActionFlow) Do() (int64, error) {
-	video := &Video{AuthorId: f.UserId, Title: f.Title, FavoriteCount: 0, CommentCount: 0, Status: 0}
+	video := &entity.Video{AuthorId: f.UserId, Title: f.Title, FavoriteCount: 0, CommentCount: 0, Status: 0}
 	// HashValue
 	if hashVal, err := getHashValue(f.Data); err != nil {
 		return -1, err
@@ -76,12 +77,18 @@ func (f *PublishActionFlow) Do() (int64, error) {
 		return -1, err
 	}
 
-	// 持久化TODO
-	if videoId, err := repo.NewVideoRepoInstance().Create((*repo.Video)(video)); err != nil {
+	// 持久化
+	// 测试TODO
+	if _, err := repo.NewVideoRepoInstance().CreateByGorm(video); err != nil {
 		return -1, err
 	} else {
-		return videoId, nil
+		return video.Id, errors.New("已发布成功，为了方便测试故意Error")
 	}
+	// if videoId, err := repo.NewVideoRepoInstance().Create((*repo.Video)(video)); err != nil {
+	// 	return -1, err
+	// } else {
+	// 	return videoId, nil
+	// }
 }
 
 func (f *PublishActionFlow) getPlayUrl() (string, string, error) {
@@ -143,7 +150,7 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	return coverUrl, imgPath, err
 }
 
-func checkVideo(video *Video) error {
+func checkVideo(video *entity.Video) error {
 	// 1. 检查标题
 	// 1.1 标题长度
 	// 1.2 标题敏感词（字典树）

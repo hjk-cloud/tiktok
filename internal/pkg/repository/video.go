@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"sync"
@@ -104,9 +105,19 @@ func (*VideoRepo) Create(video *(entity.Video)) (int64, error) {
 }
 
 // 奇怪
-func (*VideoRepo) CreateByGorm(video *(entity.Video)) (int64, error) {
-	fmt.Println("#####", video.TableName())
+func (*VideoRepo) GCreate(video *(entity.Video)) (int64, error) {
+	// fmt.Println("#####", video.TableName())
 	gdb = NewGormDB()
 	gdb.Create(video)
 	return video.Id, nil
+}
+
+func (*VideoRepo) GExistUidHash(userid int64, hash string) bool {
+	// fmt.Println("#####", userid, hash)
+	gdb = NewGormDB()
+	var video *entity.Video
+	result := gdb.Where(&entity.Video{AuthorId: userid, HashValue: hash}, // , Status: 0
+		map[string]interface{}{"Status": 0}).Find(video)
+	// fmt.Println(result)
+	return !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }

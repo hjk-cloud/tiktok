@@ -37,7 +37,7 @@ func NewPublishActionFlow(c *gin.Context, p *param.PublishActionParam) *PublishA
 }
 
 func (f *PublishActionFlow) Do() (int64, error) {
-	video := &entity.Video{AuthorId: f.UserId, Title: f.Title, FavoriteCount: 0, CommentCount: 0, Status: 0}
+	video := &entity.Video{AuthorId: f.UserId, Title: strings.TrimSpace(f.Title), FavoriteCount: 0, CommentCount: 0, Status: 0}
 	// HashValue
 	if hashVal, err := getHashValue(f.Data); err != nil {
 		return -1, err
@@ -67,19 +67,19 @@ func (f *PublishActionFlow) Do() (int64, error) {
 
 	// fmt.Println("minio视频链接", video.PlayUrl)
 	// fmt.Println("minio封面链接", video.CoverUrl)
-	// 删除视频和封面的临时文件TODO：defer
+	// 删除视频和封面的临时文件TODO：defer可以这么用吗？
 	fmt.Println("视频待删除" + localVideoPath)
 	fmt.Println("封面待删除" + localCoverPath)
 
 	video.CreateTime = time.Now().Local() // 默认？
 	fmt.Printf("Video: %+v\n", video)
-	if err := checkVideo(video); err != nil {
+	if err := checkVideo(video, localVideoPath); err != nil {
 		return -1, err
 	}
 
 	// 持久化
 	// 测试TODO
-	if _, err := repo.NewVideoRepoInstance().CreateByGorm(video); err != nil {
+	if _, err := repo.NewVideoRepoInstance().GCreate(video); err != nil {
 		return -1, err
 	} else {
 		return video.Id, errors.New("已发布成功，为了方便测试故意Error")
@@ -150,15 +150,49 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	return coverUrl, imgPath, err
 }
 
-func checkVideo(video *entity.Video) error {
+func checkVideo(video *entity.Video, localVideoPath string) error {
 	// 1. 检查标题
 	// 1.1 标题长度
+	title := video.Title
+	if len(title) > 20*3 {
+		return errors.New("title too long")
+	}
 	// 1.2 标题敏感词（字典树）
+	if err := util.CheckSensitive(title); err != nil {
+		return err
+	}
 
 	// 2. 检查视频
+	realVideoPath := config.STATIC_DIR + localVideoPath
 	// 2.1 检查视频大小 1G
-	// 2.2 检查视频时长	15min
-	// 2.3 检查视频重复 哈希值
+	fi, err := os.Stat(realVideoPath)
+	if err != nil {
+		return err
+	}
+	// 1GB
+	fmt.Println("###文件大小：", fi.Size()/1024/1024, "MB")
+	if fi.Size() > 1024*1024*1024 {
+		return errors.New("视频文件太大！")
+	}
 
+	// 2.2 检查视频时长	15min
+	file, err := os.Open(realVideoPath)
+	if err != nil {
+		panic(err)
+	}
+	duration, err := util.GetMP4Duration(file)
+	fmt.Println("#####################检查视频", realVideoPath, duration, "seconds")
+	if err != nil {
+		return err
+	}
+	// 15min
+	if duration > 15*60 {
+		return errors.New("video too long")
+	}
+	// 2.3 检查视频重复 哈希值
+	// TODO：为了测试方便，暂时关闭
+	// if repo.NewVideoRepoInstance().GExistUidHash(video.AuthorId, video.HashValue) {
+	// 	return errors.New("请不要重复发表同一视频！")
+	// }
 	return nil
 }

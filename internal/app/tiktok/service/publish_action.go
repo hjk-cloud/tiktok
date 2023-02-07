@@ -4,10 +4,12 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -61,6 +63,9 @@ func (f *PublishActionFlow) Do() (int64, error) {
 		localCoverPath = tmpPath
 		video.CoverUrl = coverUrl
 	}
+
+	// fmt.Println("minio视频链接", video.PlayUrl)
+	// fmt.Println("minio封面链接", video.CoverUrl)
 	// 删除视频和封面的临时文件TODO：defer
 	fmt.Println("视频待删除" + localVideoPath)
 	fmt.Println("封面待删除" + localCoverPath)
@@ -93,13 +98,13 @@ func (f *PublishActionFlow) getPlayUrl() (string, string, error) {
 	if err := f.Context.SaveUploadedFile(f.Data, saveFile); err != nil {
 		return "", "", err
 	}
-	// public\1_tiktok.mp4 -> http://192.168.1.2:8080/static/1_tiktok.mp4
-	relativePath := fmt.Sprintf("%s/%s", ymdh, finalName)
-	playUrl := config.HOST + "/static" + relativePath
-	// strings.Join(strings.Split(finalName, string(filepath.Separator)), "/")
 
-	fmt.Println(playUrl, relativePath)
-	return playUrl, relativePath, nil
+	videoPath := fmt.Sprintf("%s/%s", ymdh, finalName)
+
+	playUrl, err := util.Upload(saveFile, videoPath)
+
+	// fmt.Println(playUrl, videoPath)
+	return playUrl, videoPath, err
 }
 
 func getHashValue(data *multipart.FileHeader) (string, error) {
@@ -117,26 +122,25 @@ func getHashValue(data *multipart.FileHeader) (string, error) {
 	return hash, nil
 }
 
-// 第一帧。videoPath："\y\M\d\uuid_1_tiktok.mp4"
+// 第一帧
 func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	// 使用 ffmpeg 提取指定帧作为图像文件
 	// ffmpeg -i tiktok.mp4 -vframes 1 -f image2 cover-%03d.png
 	dotIdx := strings.LastIndex(videoPath, ".")
-	imgPath := videoPath[:dotIdx] + "-cover.png" // `\y\M\d\1_tiktok-cover.png`
-	fmt.Println("视频路径", config.STATIC_DIR+videoPath)
-	fmt.Println("封面路径", config.STATIC_DIR+imgPath)
-	cmd := exec.Command("ffmpeg", "-i", config.STATIC_DIR+videoPath, "-vframes", "1", "-f", "image2", config.STATIC_DIR+imgPath)
+	imgPath := videoPath[:dotIdx] + "-cover.png"
+	// fmt.Println("视频路径", config.STATIC_DIR+videoPath)
+	// fmt.Println("封面路径", config.STATIC_DIR+imgPath)
+	finalPath := config.STATIC_DIR + imgPath
+	// TODO：优化
+	vfnum := 1
+	cmd := exec.Command("ffmpeg", "-i", config.STATIC_DIR+videoPath, "-vframes", strconv.Itoa(vfnum), "-f", "image2", finalPath)
 	if err := cmd.Run(); err != nil {
-		fmt.Println("Failed to extract frame:", err)
+		log.Println("Failed to extract frame:", err)
 		return "", imgPath, err
 	}
-	// sepIdx := strings.Index(imgPath, string(filepath.Separator))
-	// filename := imgPath[sepIdx+1:]
-	// `\y\M\d\1_tiktok-cover.png` -> http://192.168.1.2:8080/static/y/M/d/1_tiktok-cover.png
-	// coverUrl := config.HOST + "/static" + strings.Join(strings.Split(imgPath, string(filepath.Separator)), "/")
-	coverUrl := config.HOST + "/static" + imgPath
-	fmt.Println(coverUrl, imgPath)
-	return coverUrl, imgPath, nil
+	coverUrl, err := util.Upload(finalPath, imgPath)
+	// fmt.Println(coverUrl, imgPath)
+	return coverUrl, imgPath, err
 }
 
 func checkVideo(video *Video) error {

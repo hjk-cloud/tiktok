@@ -4,8 +4,8 @@ var DemoVideos = []Video{
 	{
 		Id:            1,
 		Author:        DemoUser,
-		PlayUrl:       "http://192.168.1.2:8080/static/2023/2/5/21/e1c218f4-3288-4f17-9117-0f7f5e1407ac_1_tiktok.mp4",
-		CoverUrl:      "http://192.168.1.2:8080/static/2023/2/5/21/e1c218f4-3288-4f17-9117-0f7f5e1407ac_1_tiktok-cover.png",
+		PlayUrl:       "http://42.192.195.241:9001/video/2023/2/7/12/cd05492c-af9d-41b6-bced-640848318e1b_1_bandicam 2023-02-05 10-33-42-723 lcwk331_1.mp4",
+		CoverUrl:      "http://42.192.195.241:9001/image/2023/2/7/12/cd05492c-af9d-41b6-bced-640848318e1b_1_bandicam 2023-02-05 10-33-42-723 lcwk331_1-cover.png",
 		FavoriteCount: 0,
 		CommentCount:  0,
 		IsFavorite:    false,

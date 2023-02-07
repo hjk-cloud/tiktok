@@ -2,14 +2,14 @@ package service
 
 import (
 	"errors"
-	"github.com/RaymondCode/simple-demo/model"
+	"github.com/RaymondCode/simple-demo/internal/pkg/model/entity"
 	"github.com/RaymondCode/simple-demo/util"
 )
 
 type UserRegisterFlow struct {
 	Username string
 	Password string
-	User     *model.UserAuth
+	User     *entity.UserAuth
 	UserId   int64
 	Token    string
 }
@@ -40,7 +40,7 @@ func (f *UserRegisterFlow) checkParam() error {
 		return errors.New("用户名不能为空")
 	}
 
-	userDao := model.NewUserDaoInstance()
+	userDao := entity.NewUserDaoInstance()
 
 	if count, err := userDao.QueryUserByName(f.Username); err == nil && count > 0 {
 		return errors.New("用户名已存在")
@@ -50,14 +50,14 @@ func (f *UserRegisterFlow) checkParam() error {
 }
 
 func (f *UserRegisterFlow) Register() error {
-	userDao := model.NewUserDaoInstance()
+	userDao := entity.NewUserDaoInstance()
 
 	worker := util.NewWorker(f.UserId)
 	id := worker.GetId()
 
 	password := util.Argon2Encrypt(f.Password)
 
-	user := &model.UserAuth{
+	user := &entity.UserAuth{
 		Id:       id,
 		Name:     f.Username,
 		Password: password,
@@ -76,7 +76,7 @@ func (f *UserRegisterFlow) Register() error {
 }
 
 func (f *UserRegisterFlow) packData() error {
-	f.User = &model.UserAuth{
+	f.User = &entity.UserAuth{
 		Id: f.UserId,
 	}
 	return nil

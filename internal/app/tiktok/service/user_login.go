@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/RaymondCode/simple-demo/model"
+	"github.com/RaymondCode/simple-demo/internal/pkg/model/entity"
 	"github.com/RaymondCode/simple-demo/util"
 )
 
@@ -15,7 +15,7 @@ const (
 type LoginFlow struct {
 	Username string
 	Password string
-	User     *model.UserAuth
+	User     *entity.UserAuth
 	UserId   int64
 	Token    string
 }
@@ -58,7 +58,7 @@ func (f *LoginFlow) checkParam() error {
 }
 
 func (f *LoginFlow) prepareData() error {
-	userDao := model.NewUserDaoInstance()
+	userDao := entity.NewUserDaoInstance()
 	password := util.Argon2Encrypt(f.Password)
 	userId, err := userDao.Login(f.Username, password)
 	if err != nil {
@@ -74,7 +74,7 @@ func (f *LoginFlow) prepareData() error {
 }
 
 func (f *LoginFlow) packData() error {
-	f.User = &model.UserAuth{
+	f.User = &entity.UserAuth{
 		Id:   f.UserId,
 		Name: f.Username,
 	}

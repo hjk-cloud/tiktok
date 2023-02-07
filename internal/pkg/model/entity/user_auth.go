@@ -1,7 +1,8 @@
-package model
+package entity
 
 import (
 	"errors"
+	"github.com/RaymondCode/simple-demo/model"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -32,12 +33,12 @@ func NewUserDaoInstance() *UserDao {
 
 func (*UserDao) QueryUserByName(name string) (int, error) {
 	var count int64
-	db.Model(&UserAuth{}).Where("name = ?", name).Count(&count)
+	model.db.Model(&UserAuth{}).Where("name = ?", name).Count(&count)
 	return int(count), nil
 }
 
 func (*UserDao) Register(user *UserAuth) error {
-	err := db.Select("id", "name", "password").Create(&user).Error
+	err := model.db.Select("id", "name", "password").Create(&user).Error
 	if err != nil {
 		return errors.New("创建用户失败")
 	}
@@ -46,7 +47,7 @@ func (*UserDao) Register(user *UserAuth) error {
 
 func (*UserDao) Login(name string, password string) (int64, error) {
 	var user UserAuth
-	err := db.Where("name = ? AND password = ?", name, password).Take(&user).Error
+	err := model.db.Where("name = ? AND password = ?", name, password).Take(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return 0, err
 	}
@@ -58,7 +59,7 @@ func (*UserDao) Login(name string, password string) (int64, error) {
 
 func (*UserDao) QueryUserById(id int64) (*UserAuth, error) {
 	var user UserAuth
-	err := db.Where("id = ?", id).Take(&user).Error
+	err := model.db.Where("id = ?", id).Take(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}

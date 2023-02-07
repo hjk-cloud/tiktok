@@ -1,4 +1,4 @@
-package model
+package entity
 
 type UserInfo struct {
 	Id            int64  `json:"id,omitempty"`

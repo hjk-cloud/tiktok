@@ -4,8 +4,8 @@ var DemoVideos = []Video{
 	{
 		Id:            1,
 		Author:        DemoUser,
-		PlayUrl:       "https://www.w3schools.com/html/movie.mp4",
-		CoverUrl:      "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+		PlayUrl:       "http://42.192.195.241:9001/video/2023/2/7/12/cd05492c-af9d-41b6-bced-640848318e1b_1_bandicam 2023-02-05 10-33-42-723 lcwk331_1.mp4",
+		CoverUrl:      "http://42.192.195.241:9001/image/2023/2/7/12/cd05492c-af9d-41b6-bced-640848318e1b_1_bandicam 2023-02-05 10-33-42-723 lcwk331_1-cover.png",
 		FavoriteCount: 0,
 		CommentCount:  0,
 		IsFavorite:    false,

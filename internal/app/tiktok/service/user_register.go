@@ -2,8 +2,9 @@ package service
 
 import (
 	"errors"
-	"github.com/RaymondCode/simple-demo/internal/pkg/model/entity"
-	"github.com/RaymondCode/simple-demo/util"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
+	"github.com/hjk-cloud/tiktok/util"
 )
 
 type UserRegisterFlow struct {
@@ -40,7 +41,7 @@ func (f *UserRegisterFlow) checkParam() error {
 		return errors.New("用户名不能为空")
 	}
 
-	userDao := entity.NewUserDaoInstance()
+	userDao := repo.NewUserDaoInstance()
 
 	if count, err := userDao.QueryUserByName(f.Username); err == nil && count > 0 {
 		return errors.New("用户名已存在")
@@ -50,7 +51,7 @@ func (f *UserRegisterFlow) checkParam() error {
 }
 
 func (f *UserRegisterFlow) Register() error {
-	userDao := entity.NewUserDaoInstance()
+	userDao := repo.NewUserDaoInstance()
 
 	worker := util.NewWorker(f.UserId)
 	id := worker.GetId()

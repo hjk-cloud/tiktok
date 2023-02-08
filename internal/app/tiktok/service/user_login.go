@@ -2,8 +2,9 @@ package service
 
 import (
 	"errors"
-	"github.com/RaymondCode/simple-demo/internal/pkg/model/entity"
-	"github.com/RaymondCode/simple-demo/util"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
+	"github.com/hjk-cloud/tiktok/util"
 )
 
 const (
@@ -58,7 +59,7 @@ func (f *LoginFlow) checkParam() error {
 }
 
 func (f *LoginFlow) prepareData() error {
-	userDao := entity.NewUserDaoInstance()
+	userDao := repo.NewUserDaoInstance()
 	password := util.Argon2Encrypt(f.Password)
 	userId, err := userDao.Login(f.Username, password)
 	if err != nil {

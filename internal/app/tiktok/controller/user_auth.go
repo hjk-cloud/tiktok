@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"net/http"
 )
 

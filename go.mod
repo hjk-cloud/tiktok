@@ -1,11 +1,16 @@
-module github.com/hjk-cloud/tiktok
+module github.com/RaymondCode/simple-demo
 
 go 1.17
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/gavv/httpexpect/v2 v2.8.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/stretchr/testify v1.7.1
+	golang.org/x/crypto v0.5.0
+	gorm.io/driver/mysql v1.4.5
+	gorm.io/gorm v1.24.4
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.1
 	github.com/u2takey/ffmpeg-go v0.4.1

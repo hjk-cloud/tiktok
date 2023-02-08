@@ -44,7 +44,7 @@ func (f *PublishActionFlow) Do() (int64, error) {
 	} else {
 		video.HashValue = hashVal
 	}
-	// PlayUrl: public\1_tiktok.mp4 -> http://192.168.1.2:8080/static/1_tiktok.mp4
+	// PlayUrl
 	var localVideoPath string
 	if playUrl, tmpPath, err := f.getPlayUrl(); err != nil {
 		return -1, err
@@ -53,8 +53,8 @@ func (f *PublishActionFlow) Do() (int64, error) {
 		video.PlayUrl = playUrl
 	}
 
+	// CoverUrl
 	// 截取第 1 帧作为封面
-	// CoverUrl: public\1_tiktok-cover.png -> http://192.168.1.2:8080/static/1_tiktok-cover.png
 	vframe := 1 // TODO
 
 	var localCoverPath string

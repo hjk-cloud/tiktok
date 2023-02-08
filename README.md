@@ -7,15 +7,21 @@
 工程无其他依赖，直接编译运行即可
 
 ```shell
+# tiktok服务端
+cd ./cmd/tiktok
 go build && ./tiktok
+
+# tiktok定时任务删除/web下到期视频和图片文件
+cd ./cmd/tiktok-schedule
+go build && ./tiktok-schedule
 ```
 
 ### 功能说明
 
 接口功能不完善，仅作为示例
 
-* 用户登录数据保存在内存中，单次运行过程中有效
-* 视频上传后会保存到本地 public 目录中，访问时用 127.0.0.1:8080/static/video_name 即可
+~~* 用户登录数据保存在内存中，单次运行过程中有效~~
+~~* 视频上传后会保存到本地 public 目录中，访问时用 127.0.0.1:8080/static/video_name 即可~~
 
 ### 测试
 

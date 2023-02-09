@@ -1,0 +1,1 @@
+SchTasks /Create /TN "tiktok-schedule" /XML tiktok-schedule.xml

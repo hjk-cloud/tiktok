@@ -19,12 +19,12 @@ func Publish(c *gin.Context) {
 
 	// 是否登录
 	var userId int64
-	if user, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-		return
-	} else {
-		userId = user.Id
-	}
+	//if user, exist := usersLoginInfo[token]; !exist {
+	//	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	//	return
+	//} else {
+	//	userId = user.Id
+	//}
 
 	title := c.PostForm("title")
 

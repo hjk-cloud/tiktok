@@ -40,9 +40,9 @@ func (f *UserRegisterFlow) checkParam() error {
 	if f.Username == "" {
 		return errors.New("用户名不能为空")
 	}
+	//TODO 判断非法字符输入
 
-	userDao := repo.NewUserDaoInstance()
-
+	userDao := repo.NewUserAuthDaoInstance()
 	if count, err := userDao.QueryUserByName(f.Username); err == nil && count > 0 {
 		return errors.New("用户名已存在")
 	}
@@ -51,7 +51,7 @@ func (f *UserRegisterFlow) checkParam() error {
 }
 
 func (f *UserRegisterFlow) Register() error {
-	userDao := repo.NewUserDaoInstance()
+	userDao := repo.NewUserAuthDaoInstance()
 
 	worker := util.NewWorker(f.UserId)
 	id := worker.GetId()

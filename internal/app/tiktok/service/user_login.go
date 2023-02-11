@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	MaxUsernameLength = 20
+	MaxUsernameLength = 30
 	MaxPasswordLength = 20
 	MinPasswordLength = 6
 )
@@ -59,7 +59,7 @@ func (f *LoginFlow) checkParam() error {
 }
 
 func (f *LoginFlow) prepareData() error {
-	userDao := repo.NewUserDaoInstance()
+	userDao := repo.NewUserAuthDaoInstance()
 	password := util.Argon2Encrypt(f.Password)
 	userId, err := userDao.Login(f.Username, password)
 	if err != nil {

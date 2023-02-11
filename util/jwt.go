@@ -2,7 +2,8 @@ package util
 
 import (
 	"errors"
-	"github.com/RaymondCode/simple-demo/internal/pkg/model/entity"
+	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
+
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -65,7 +66,7 @@ func JWTAuth(token string) (int64, error) {
 		return 0, errors.New("token过期")
 	}
 	//最后验证这个user是否真的存在
-	if _, err := entity.NewUserDaoInstance().QueryUserById(claim.UserId); err != nil {
+	if _, err := repo.NewUserInfoDaoInstance().QueryUserById(claim.UserId); err != nil {
 		return 0, errors.New("user不存在")
 	}
 

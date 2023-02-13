@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/param"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 )
 
 type VideoListResponse struct {
@@ -16,26 +17,24 @@ type VideoListResponse struct {
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
-
-	// 是否登录
+	// TODO：检查是否登录，放入service会导致循环引用，UsersLoginInfo不应该放controller？
 	var userId int64
-	if user, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	if user, exist := UsersLoginInfo[token]; !exist {
+		writeError(c, errors.New("User doesn't exist"))
 		return
 	} else {
 		userId = user.Id
 	}
 
 	title := c.PostForm("title")
-
 	data, err := c.FormFile("data")
 	if err != nil {
 		writeError(c, err)
 		return
 	}
 
-	p := &param.PublishActionParam{Token: token, Title: title, Data: data, UserId: userId}
-	if _, err := service.PublishAction(c, p); err != nil {
+	p := &dto.PublishActionDTO{Context: c, Token: token, Title: title, Data: data, UserId: userId}
+	if _, err := service.PublishAction(p); err != nil {
 		writeError(c, err)
 		return
 	}
@@ -48,9 +47,6 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	// fmt.Println("###PublishList")
-	// fmt.Printf("gin.Context: %+v\n", c)
-	// fmt.Printf("gin.Context: %#v\n", c)
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,

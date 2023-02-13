@@ -1,4 +1,4 @@
-package flow
+package dto
 
 import (
 	"mime/multipart"
@@ -6,11 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type PublishActionFlow struct {
+type PublishActionDTO struct {
 	Context *gin.Context
 	Token   string
 	Title   string
 	Data    *multipart.FileHeader
-	UserId  int64
-	// Video  *Video
+
+	UserId int64
 }

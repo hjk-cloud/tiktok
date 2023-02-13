@@ -1,15 +1,16 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync/atomic"
+
+	"github.com/gin-gonic/gin"
 )
 
-// usersLoginInfo use map to store user info, and key is username+password for demo
+// UsersLoginInfo use map to store user info, and key is username+password for demo
 // user data will be cleared every time the server starts
 // test data: username=zhanglei, password=douyin
-var usersLoginInfo = map[string]User{
+var UsersLoginInfo = map[string]User{
 	"zhangleidouyin": {
 		Id:            1,
 		Name:          "zhanglei",
@@ -38,7 +39,7 @@ func Register(c *gin.Context) {
 
 	token := username + password
 
-	if _, exist := usersLoginInfo[token]; exist {
+	if _, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
@@ -48,7 +49,7 @@ func Register(c *gin.Context) {
 			Id:   userIdSequence,
 			Name: username,
 		}
-		usersLoginInfo[token] = newUser
+		UsersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   userIdSequence,
@@ -63,7 +64,7 @@ func Login(c *gin.Context) {
 
 	token := username + password
 
-	if user, exist := usersLoginInfo[token]; exist {
+	if user, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user.Id,
@@ -79,7 +80,7 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 
-	if user, exist := usersLoginInfo[token]; exist {
+	if user, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,

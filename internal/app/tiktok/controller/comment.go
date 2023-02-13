@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CommentListResponse struct {
@@ -20,7 +21,7 @@ func CommentAction(c *gin.Context) {
 	token := c.Query("token")
 	actionType := c.Query("action_type")
 
-	if user, exist := usersLoginInfo[token]; exist {
+	if user, exist := UsersLoginInfo[token]; exist {
 		if actionType == "1" {
 			text := c.Query("comment_text")
 			c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},

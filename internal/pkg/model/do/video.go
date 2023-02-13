@@ -1,10 +1,10 @@
-package entity
+package do
 
 import (
 	"time"
 )
 
-type Video struct {
+type VideoDO struct {
 	// gorm.Model
 	Id            int64      `gorm:"primaryKey"`
 	AuthorId      int64      `gorm:"index:idx_user_id;"`
@@ -19,6 +19,6 @@ type Video struct {
 	UpdateTime    *time.Time // 指针可以是nil，对应可空字段
 }
 
-func (Video) TableName() string {
+func (VideoDO) TableName() string {
 	return "t_video" // 自动映射成`videos`，不一致，所以要这样指定
 }

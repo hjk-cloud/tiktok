@@ -16,9 +16,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/config"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/flow"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/param"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
 
@@ -26,18 +25,25 @@ import (
 )
 
 // type Video entity.Video
-type PublishActionFlow flow.PublishActionFlow
+// type PublishActionDTO struct {
+// 	dto.PublishActionDTO
+// 	UserId int64
+// }
 
-func PublishAction(c *gin.Context, p *param.PublishActionParam) (int64, error) {
-	return NewPublishActionFlow(c, p).Do()
-}
+// func (p *dto.PublishActionDTO) Convert() *PublishActionDTO {
+// 	return &PublishActionDTO{p,""}
+//  }
 
-func NewPublishActionFlow(c *gin.Context, p *param.PublishActionParam) *PublishActionFlow {
-	return &PublishActionFlow{Context: c, Token: p.Token, Title: p.Title, Data: p.Data, UserId: p.UserId}
-}
+func PublishAction(f *dto.PublishActionDTO) (int64, error) {
+	video := &do.VideoDO{Title: strings.TrimSpace(f.Title), FavoriteCount: 0, CommentCount: 0, Status: 0}
 
-func (f *PublishActionFlow) Do() (int64, error) {
-	video := &entity.Video{AuthorId: f.UserId, Title: strings.TrimSpace(f.Title), FavoriteCount: 0, CommentCount: 0, Status: 0}
+	// // 是否登录放入service会导致循环引用，UsersLoginInfo不应该放controller？
+	// if user, exist := controller.UsersLoginInfo[f.Token]; !exist {
+	// 	return -1, errors.New("User doesn't exist")
+	// } else {
+	// 	video.AuthorId = user.Id
+	// }
+
 	// HashValue
 	if hashVal, err := getHashValue(f.Data); err != nil {
 		return -1, err
@@ -46,7 +52,7 @@ func (f *PublishActionFlow) Do() (int64, error) {
 	}
 	// PlayUrl
 	var localVideoPath string
-	if playUrl, tmpPath, err := f.getPlayUrl(); err != nil {
+	if playUrl, tmpPath, err := getPlayUrl(f.Context, f.Data, video.AuthorId); err != nil {
 		return -1, err
 	} else {
 		localVideoPath = tmpPath
@@ -57,19 +63,19 @@ func (f *PublishActionFlow) Do() (int64, error) {
 	// 截取第 1 帧作为封面
 	vframe := 1 // TODO
 
-	var localCoverPath string
-	if coverUrl, tmpPath, err := getCoverUrl(localVideoPath, vframe); err != nil {
+	// var localCoverPath string
+	if coverUrl, _, err := getCoverUrl(localVideoPath, vframe); err != nil {
 		return -1, err
 	} else {
-		localCoverPath = tmpPath
+		// localCoverPath = tmpPath
 		video.CoverUrl = coverUrl
 	}
 
 	// fmt.Println("minio视频链接", video.PlayUrl)
 	// fmt.Println("minio封面链接", video.CoverUrl)
 	// 删除视频和封面的临时文件TODO：defer可以这么用吗？
-	fmt.Println("视频待删除" + localVideoPath)
-	fmt.Println("封面待删除" + localCoverPath)
+	// fmt.Println("视频待删除" + localVideoPath)
+	// fmt.Println("封面待删除" + localCoverPath)
 
 	video.CreateTime = time.Now().Local() // 默认？
 	fmt.Printf("Video: %+v\n", video)
@@ -79,7 +85,7 @@ func (f *PublishActionFlow) Do() (int64, error) {
 
 	// 持久化
 	// 测试TODO
-	if _, err := repo.NewVideoRepoInstance().GCreate(video); err != nil {
+	if _, err := repo.NewVideoRepoInstance().Create(video); err != nil {
 		return -1, err
 	} else {
 		return video.Id, errors.New("已发布成功，为了方便测试故意Error")
@@ -91,7 +97,7 @@ func (f *PublishActionFlow) Do() (int64, error) {
 	// }
 }
 
-func (f *PublishActionFlow) getPlayUrl() (string, string, error) {
+func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) (string, string, error) {
 	now := time.Now().Local()
 	ymdh := fmt.Sprintf("/%d/%d/%d/%d", now.Year(), now.Month(), now.Day(), now.Hour())
 	dir := config.STATIC_DIR + ymdh
@@ -99,10 +105,10 @@ func (f *PublishActionFlow) getPlayUrl() (string, string, error) {
 		return "", "", err
 	}
 
-	filename := filepath.Base(f.Data.Filename)
-	finalName := fmt.Sprintf("%s_%d_%s", util.NewUUID(), f.UserId, filename)
+	filename := filepath.Base(data.Filename)
+	finalName := fmt.Sprintf("%s_%d_%s", util.NewUUID(), userId, filename)
 	saveFile := filepath.Join(dir, finalName)
-	if err := f.Context.SaveUploadedFile(f.Data, saveFile); err != nil {
+	if err := context.SaveUploadedFile(data, saveFile); err != nil {
 		return "", "", err
 	}
 
@@ -150,7 +156,7 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	return coverUrl, imgPath, err
 }
 
-func checkVideo(video *entity.Video, localVideoPath string) error {
+func checkVideo(video *do.VideoDO, localVideoPath string) error {
 	// 1. 检查标题
 	// 1.1 标题长度
 	title := video.Title

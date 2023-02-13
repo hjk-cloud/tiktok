@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -7,7 +7,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-func initConfig() {
+// type Config struct{
+// 	Database {
+// 		Ip
+// 		Port
+// 	}
+// 	Minio {
+// 		Ip
+// 		Port
+// 	}
+// }
+
+func init() {
+	fmt.Println("#####config.init()")
 	workDir, _ := os.Getwd()                       //获取目录对应的路径
 	viper.SetConfigName("tiktok")                  //配置文件名
 	viper.SetConfigType("yaml")                    //配置文件类型

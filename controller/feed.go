@@ -5,13 +5,14 @@ import (
 	"github.com/hjk-cloud/tiktok/model"
 	"github.com/hjk-cloud/tiktok/service"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 type FeedResponse struct {
-	Response
-	VideoList []model.Video `json:"video_list,omitempty"`
-	NextTime  int64         `json:"next_time,omitempty"`
+	model.Response
+	VideoList []model.VideoFlow `json:"video_list,omitempty"`
+	NextTime  int64             `json:"next_time,omitempty"`
 }
 
 // Feed same demo video list for every request
@@ -21,12 +22,24 @@ func Feed(c *gin.Context) {
 	//	VideoList: DemoVideos,
 	//	NextTime:  time.Now().Unix(),
 	//})
-	latestTime := time.Now()
-	videos, _ := service.QueryFeedList(latestTime)
+
+	//token := c.Param("token")
+	var token string
+	var latestTime time.Time
+	// 获取请求参数的时间
+	times, err := strconv.ParseInt(c.Param("latest_time"), 10, 64)
+	// 有参数用参数，无参数用当前时间
+	if err == nil {
+		latestTime = time.Unix(0, times*1e6).Local()
+	} else {
+		latestTime = time.Now()
+	}
+
+	videos, nextTime, _ := service.QueryFeedList(token, latestTime)
 
 	c.JSON(http.StatusOK, FeedResponse{
-		Response:  Response{StatusCode: 0},
+		Response:  model.Response{StatusCode: 0, StatusMsg: "success"},
 		VideoList: videos,
-		NextTime:  time.Now().Unix(),
+		NextTime:  nextTime,
 	})
 }

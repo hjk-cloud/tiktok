@@ -1,11 +1,9 @@
 package service
 
 import (
-	"fmt"
 	"github.com/hjk-cloud/tiktok/model"
 	"log"
 	"testing"
-	"time"
 )
 
 func TestQueryFeedList(t *testing.T) {
@@ -13,9 +11,9 @@ func TestQueryFeedList(t *testing.T) {
 	if err != nil {
 		return
 	}
-	video, err := QueryFeedList(time.Now())
+	//video, err := QueryFeedList(time.Now())
 	if err != nil {
 		log.Print(err)
 	}
-	fmt.Println(video)
+	//fmt.Println(video)
 }

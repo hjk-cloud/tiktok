@@ -8,8 +8,8 @@ type Video struct {
 	Title         string
 	PlayUrl       string
 	CoverUrl      string
-	FavoriteCount int
-	CommentCount  int
+	FavoriteCount int64
+	CommentCount  int64
 	Status        byte
 	HashValue     string `gorm:"column:hash"`
 	CreateTime    time.Time

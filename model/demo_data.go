@@ -1,6 +1,6 @@
-package controller
+package model
 
-var DemoVideos = []Video{
+var DemoVideos = []VideoFlow{
 	{
 		Id:            1,
 		Author:        DemoUser,

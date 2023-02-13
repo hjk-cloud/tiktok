@@ -1,11 +1,11 @@
-package controller
+package model
 
 type Response struct {
 	StatusCode int32  `json:"status_code"`
 	StatusMsg  string `json:"status_msg,omitempty"`
 }
 
-type Video struct {
+type VideoFlow struct {
 	Id            int64  `json:"id,omitempty"`
 	Author        User   `json:"author"`
 	PlayUrl       string `json:"play_url" json:"play_url,omitempty"`

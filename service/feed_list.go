@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/hjk-cloud/tiktok/dao"
 	"github.com/hjk-cloud/tiktok/model"
 	"log"
@@ -54,6 +55,14 @@ func (f *FeedListFlow) Do() ([]model.VideoFlow, int64, error) {
 	}
 
 	//3.
-	nextTime := videos[len(videos)-1].CreateTime.Unix()
-	return videoFlows, nextTime, err
+	//如果没有视频了
+	var nextTime time.Time
+	if len(videos) != 0 {
+		nextTime = videos[len(videos)-1].CreateTime
+	} else {
+		nextTime = time.Now()
+	}
+
+	fmt.Println("feed_list:66 | Next time:", nextTime, nextTime.Unix())
+	return videoFlows, nextTime.Unix(), err
 }

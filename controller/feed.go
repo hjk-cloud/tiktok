@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/model"
 	"github.com/hjk-cloud/tiktok/service"
@@ -27,11 +28,18 @@ func Feed(c *gin.Context) {
 	var token string
 	var latestTime time.Time
 	// 获取请求参数的时间
-	times, err := strconv.ParseInt(c.Param("latest_time"), 10, 64)
-	// 有参数用参数，无参数用当前时间
+	times, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)
+	// 参数校验：有参数用参数，无参数用当前时间
 	if err == nil {
-		latestTime = time.Unix(0, times*1e6).Local()
+		//// 如果时间戳超过当前时间，则等于当前时间
+		if times > time.Now().Unix() {
+			latestTime = time.Now()
+		} else {
+			latestTime = time.Unix(times, 0)
+		}
+		fmt.Println("@@@@@Read Time: ", latestTime)
 	} else {
+		fmt.Println(err)
 		latestTime = time.Now()
 	}
 

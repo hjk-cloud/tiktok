@@ -41,6 +41,7 @@ func (*VideoDao) QueryVideoById(id int) (*model.Video, error) {
 	return &video, nil
 }
 
+// MQueryVideoByLastTime 根据时间倒序查询多个video
 func (*VideoDao) MQueryVideoByLastTime(latestTime time.Time) ([]model.Video, error) {
 	var videos []model.Video
 	// 查询语句：查询符合条件的元素，错误当场处理

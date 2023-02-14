@@ -7,18 +7,31 @@ import (
 	"github.com/spf13/viper"
 )
 
-// type Config struct{
-// 	Database {
-// 		Ip
-// 		Port
-// 	}
-// 	Minio {
-// 		Ip
-// 		Port
-// 	}
-// }
+type ConfigStruct struct {
+	Mysql struct {
+		Host     string
+		Port     int
+		Username string
+		Password string
+		Dbname   string
+	}
+	Minio struct {
+		Host     string
+		Port     int
+		Username string
+		Password string
+	}
+}
+
+var (
+	Config ConfigStruct
+)
 
 func init() {
+	LoadConfig()
+}
+
+func LoadConfig() {
 	fmt.Println("#####config.init()")
 	workDir, _ := os.Getwd()                       //获取目录对应的路径
 	viper.SetConfigName("tiktok")                  //配置文件名
@@ -35,9 +48,24 @@ func init() {
 		}
 	}
 
-	host := viper.GetString("database.host")
-	fmt.Println("viper load yml: ", host)
+	// host := viper.GetString("database.host")
+	// fmt.Println("viper load yml: ", host)
 
 	allSettings := viper.AllSettings()
 	fmt.Println(allSettings)
+
+	err := viper.Unmarshal(&Config)
+	if err != nil {
+		fmt.Printf("Error unmarshalling config: %s", err)
+	}
+	fmt.Printf("%#v\n", Config)
+}
+
+func LoadStruct() {
+	// var config Config
+	err := viper.Unmarshal(&Config)
+	if err != nil {
+		fmt.Printf("Error unmarshalling config: %s", err)
+	}
+	fmt.Println(Config)
 }

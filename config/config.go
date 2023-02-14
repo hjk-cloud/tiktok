@@ -21,6 +21,7 @@ type ConfigStruct struct {
 		Username string
 		Password string
 	}
+	StaticDir string
 }
 
 var (

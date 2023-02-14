@@ -100,7 +100,7 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) (string, string, error) {
 	now := time.Now().Local()
 	ymdh := fmt.Sprintf("/%d/%d/%d/%d", now.Year(), now.Month(), now.Day(), now.Hour())
-	dir := config.STATIC_DIR + ymdh
+	dir := config.Config.StaticDir + ymdh
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", "", err
 	}
@@ -143,10 +143,10 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	imgPath := videoPath[:dotIdx] + "-cover.png"
 	// fmt.Println("视频路径", config.STATIC_DIR+videoPath)
 	// fmt.Println("封面路径", config.STATIC_DIR+imgPath)
-	finalPath := config.STATIC_DIR + imgPath
+	finalPath := config.Config.StaticDir + imgPath
 	// TODO：优化
 	vfnum := 1
-	cmd := exec.Command("ffmpeg", "-i", config.STATIC_DIR+videoPath, "-vframes", strconv.Itoa(vfnum), "-f", "image2", finalPath)
+	cmd := exec.Command("ffmpeg", "-i", config.Config.StaticDir+videoPath, "-vframes", strconv.Itoa(vfnum), "-f", "image2", finalPath)
 	if err := cmd.Run(); err != nil {
 		log.Println("Failed to extract frame:", err)
 		return "", imgPath, err
@@ -169,14 +169,14 @@ func checkVideo(video *do.VideoDO, localVideoPath string) error {
 	}
 
 	// 2. 检查视频
-	realVideoPath := config.STATIC_DIR + localVideoPath
+	realVideoPath := config.Config.StaticDir + localVideoPath
 	// 2.1 检查视频大小 1G
 	fi, err := os.Stat(realVideoPath)
 	if err != nil {
 		return err
 	}
 	// 1GB
-	fmt.Println("###文件大小：", fi.Size()/1024/1024, "MB")
+	fmt.Println("###文件大小：", float64(fi.Size())/1024/1024, "MB")
 	if fi.Size() > 1024*1024*1024 {
 		return errors.New("视频文件太大！")
 	}

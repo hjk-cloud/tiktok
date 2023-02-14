@@ -17,9 +17,9 @@ func main() {
 	days := time.Duration(1)
 	earliest := time.Now().Local().Add(-days * 24 * time.Hour)
 	year, month, day := earliest.Year(), int(earliest.Month()), earliest.Day()
-	fmt.Println(config.STATIC_DIR, "###删到", year, month, day)
+	fmt.Println(config.Config.StaticDir, "###删到", year, month, day)
 
-	yfiles, err := ioutil.ReadDir(config.STATIC_DIR)
+	yfiles, err := ioutil.ReadDir(config.Config.StaticDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func main() {
 			log.Println(err)
 			continue
 		}
-		ypath := path.Join(config.STATIC_DIR, yf.Name())
+		ypath := path.Join(config.Config.StaticDir, yf.Name())
 		if y < year {
 			fmt.Println("删除", ypath)
 			os.RemoveAll(ypath)

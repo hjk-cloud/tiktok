@@ -14,6 +14,7 @@ var chatConnMap = sync.Map{}
 
 func RunMessageServer() {
 	listen, err := net.Listen("tcp", "127.0.0.1:9090")
+	defer listen.Close()
 	if err != nil {
 		fmt.Printf("Run message sever failed: %v\n", err)
 		return
@@ -44,6 +45,7 @@ func process(conn net.Conn) {
 			continue
 		}
 
+		// UserId 发送给 ToUserId
 		var event = dto.MessageSendEvent{}
 		_ = json.Unmarshal(buf[:n], &event)
 		fmt.Printf("Receive Message：%+v\n", event)
@@ -54,6 +56,7 @@ func process(conn net.Conn) {
 			continue
 		}
 
+		// ToUserId 接收到 UserId
 		toChatKey := fmt.Sprintf("%d_%d", event.ToUserId, event.UserId)
 		writeConn, exist := chatConnMap.Load(toChatKey)
 		if !exist {

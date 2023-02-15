@@ -1,15 +1,17 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
+	"sync/atomic"
+	"strconv"
+
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
-	"net/http"
-	"strconv"
+	"github.com/gin-gonic/gin"
 )
 
 type UserInfoResponse struct {
-	Response
+	vo.Response
 	UserInfo do.UserInfo `json:"user"`
 }
 

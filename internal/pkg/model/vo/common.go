@@ -30,10 +30,15 @@ type User struct {
 	IsFollow      bool   `json:"is_follow,omitempty"`
 }
 
+// 接口文档有问题，先自行调整
 type Message struct {
 	Id         int64  `json:"id,omitempty"`
+	FromUserId int64  `json:"from_user_id"`
+	ToUserId   int64  `json:"to_user_id"`
 	Content    string `json:"content,omitempty"`
-	CreateTime string `json:"create_time,omitempty"`
+	CreateTime int64  `json:"create_time,omitempty"`
+	FirstRead  bool
+	SecondRead bool
 }
 
 type MessageSendEvent struct {

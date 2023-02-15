@@ -48,8 +48,8 @@ func NewVideoRepoInstance() *VideoRepo {
 func (*VideoRepo) Create(video *(do.VideoDO)) (int64, error) {
 	// fmt.Println("#####", video.TableName())
 	// gdb = NewGormDB()
-	Db.Create(video)
-	return video.Id, nil
+	err := Db.Create(video).Error
+	return video.Id, err
 }
 
 func (*VideoRepo) ExistUidHash(userid int64, hash string) bool {

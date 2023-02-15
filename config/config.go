@@ -49,9 +49,6 @@ func LoadConfig() {
 		}
 	}
 
-	// host := viper.GetString("database.host")
-	// fmt.Println("viper load yml: ", host)
-
 	allSettings := viper.AllSettings()
 	fmt.Println(allSettings)
 
@@ -60,13 +57,17 @@ func LoadConfig() {
 		fmt.Printf("Error unmarshalling config: %s", err)
 	}
 	fmt.Printf("%#v\n", Config)
+
+	if err := os.MkdirAll(Config.StaticDir, 0755); err != nil {
+		fmt.Println("创建静态资源目录失败..")
+	}
 }
 
-func LoadStruct() {
-	// var config Config
-	err := viper.Unmarshal(&Config)
-	if err != nil {
-		fmt.Printf("Error unmarshalling config: %s", err)
-	}
-	fmt.Println(Config)
-}
+// func LoadStruct() {
+// 	// var config Config
+// 	err := viper.Unmarshal(&Config)
+// 	if err != nil {
+// 		fmt.Printf("Error unmarshalling config: %s", err)
+// 	}
+// 	fmt.Println(Config)
+// }

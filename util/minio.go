@@ -56,7 +56,7 @@ func Upload(localFile string, remoteFile string) (string, error) {
 		log.Printf("Successfully created %s\n", bucketName)
 	}
 
-	objectName := remoteFile
+	objectName := strings.ReplaceAll(remoteFile, " ", "_")
 	// contentType := "application/zip"
 
 	// Upload the zip file with FPutObject

@@ -23,6 +23,7 @@ go.work
 .idea
 
 
-config
+config/*
+!config/config.go
 web
 test.go

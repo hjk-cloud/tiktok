@@ -7,7 +7,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/flow"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 )
 
 var chatConnMap = sync.Map{}
@@ -44,7 +44,7 @@ func process(conn net.Conn) {
 			continue
 		}
 
-		var event = flow.MessageSendEvent{}
+		var event = dto.MessageSendEvent{}
 		_ = json.Unmarshal(buf[:n], &event)
 		fmt.Printf("Receive Message：%+v\n", event)
 
@@ -61,7 +61,7 @@ func process(conn net.Conn) {
 			continue
 		}
 
-		pushEvent := flow.MessagePushEvent{
+		pushEvent := dto.MessagePushEvent{
 			FromUserId: event.UserId,
 			MsgContent: event.MsgContent,
 		}

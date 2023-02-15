@@ -23,6 +23,7 @@ func NewUserInfoDaoInstance() *UserInfoDao {
 
 func (*UserInfoDao) QueryUserById(id int64) (*entity.UserInfo, error) {
 	var user entity.UserInfo
+	gdb = NewGormDB()
 	err := gdb.Where("id = ?", id).Take(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil

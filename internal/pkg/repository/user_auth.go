@@ -22,6 +22,7 @@ func NewUserAuthDaoInstance() *UserAuthDao {
 
 func (*UserAuthDao) QueryUserByName(name string) (int, error) {
 	var count int64
+	gdb = NewGormDB()
 	gdb.Model(&entity.UserAuth{}).Where("name = ?", name).Count(&count)
 	return int(count), nil
 }
@@ -41,6 +42,7 @@ func (*UserAuthDao) Register(user *entity.UserAuth) error {
 
 func (*UserAuthDao) Login(name string, password string) (int64, error) {
 	var user entity.UserAuth
+	gdb = NewGormDB()
 	err := gdb.Where("name = ? AND password = ?", name, password).Take(user).Error
 	if err == gorm.ErrRecordNotFound {
 		return 0, err

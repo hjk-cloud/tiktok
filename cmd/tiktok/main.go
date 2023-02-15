@@ -5,14 +5,13 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/hjk-cloud/tiktok/config"
-	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	_ "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 )
 
 // config 要在 repository 前 init
 
 func main() {
-	go service.RunMessageServer() // 结束时需要关闭、让出端口
+	//go service.RunMessageServer() // 结束时需要关闭、让出端口
 	r := gin.Default()
 
 	initRouter(r)

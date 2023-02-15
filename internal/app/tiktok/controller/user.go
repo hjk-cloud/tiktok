@@ -11,7 +11,7 @@ import (
 )
 
 type UserInfoResponse struct {
-	Response
+	vo.Response
 	UserInfo do.UserInfo `json:"user"`
 }
 
@@ -22,12 +22,12 @@ func UserInfo(c *gin.Context) {
 
 	if user, err := service.GetUserInfo(token, userId); err == nil {
 		c.JSON(http.StatusOK, UserInfoResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			UserInfo: *user,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserInfoResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})
 	}
 }

@@ -42,7 +42,7 @@ func (*UserAuthDao) Register(user *do.UserAuth) error {
 
 func (*UserAuthDao) Login(name string, password string) (int64, error) {
 	var user do.UserAuth
-	err := Db.Where("name = ? AND password = ?", name, password).Take(user).Error
+	err := Db.Where("name = ? AND password = ?", name, password).Take(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return 0, errors.New("用户名或密码错误")
 	}

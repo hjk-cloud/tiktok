@@ -60,41 +60,25 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 	}
 
 	// CoverUrl
-	// 截取第 1 帧作为封面
-	vframe := 1 // TODO
-
-	// var localCoverPath string
+	// 截取第 1 帧作为封面，与客户端保持一致
+	vframe := 1
 	if coverUrl, _, err := getCoverUrl(localVideoPath, vframe); err != nil {
 		return -1, err
 	} else {
-		// localCoverPath = tmpPath
 		video.CoverUrl = coverUrl
 	}
 
-	// fmt.Println("minio视频链接", video.PlayUrl)
-	// fmt.Println("minio封面链接", video.CoverUrl)
-	// 删除视频和封面的临时文件TODO：defer可以这么用吗？
-	// fmt.Println("视频待删除" + localVideoPath)
-	// fmt.Println("封面待删除" + localCoverPath)
-
-	video.CreateTime = time.Now().Local() // 默认？
+	video.CreateTime = time.Now().Local() // mysql设置的默认值用不到？
 	fmt.Printf("Video: %+v\n", video)
 	if err := checkVideo(video, localVideoPath); err != nil {
 		return -1, err
 	}
 
-	// 持久化
-	// 测试TODO
 	if _, err := repo.NewVideoRepoInstance().Create(video); err != nil {
 		return -1, err
 	} else {
 		return video.Id, errors.New("已发布成功，为了方便测试故意Error")
 	}
-	// if videoId, err := repo.NewVideoRepoInstance().Create((*repo.Video)(video)); err != nil {
-	// 	return -1, err
-	// } else {
-	// 	return videoId, nil
-	// }
 }
 
 func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) (string, string, error) {
@@ -144,9 +128,7 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	// fmt.Println("视频路径", config.STATIC_DIR+videoPath)
 	// fmt.Println("封面路径", config.STATIC_DIR+imgPath)
 	finalPath := config.Config.StaticDir + imgPath
-	// TODO：优化
-	vfnum := 1
-	cmd := exec.Command("ffmpeg", "-i", config.Config.StaticDir+videoPath, "-vframes", strconv.Itoa(vfnum), "-f", "image2", finalPath)
+	cmd := exec.Command("ffmpeg", "-i", config.Config.StaticDir+videoPath, "-vframes", strconv.Itoa(frameNumber), "-f", "image2", finalPath)
 	if err := cmd.Run(); err != nil {
 		log.Println("Failed to extract frame:", err)
 		return "", imgPath, err

@@ -55,10 +55,3 @@ func PublishList(c *gin.Context) {
 		VideoList: DemoVideos,
 	})
 }
-
-func writeError(c *gin.Context, err error) {
-	c.JSON(http.StatusOK, vo.Response{
-		StatusCode: 1,
-		StatusMsg:  err.Error(),
-	})
-}

@@ -19,6 +19,7 @@ type MessageActionDTO struct {
 }
 
 type MessageChatDTO struct {
-	UserId   int64 `json:"user_id,omitempty"`
-	ToUserId int64 `json:"to_user_id,omitempty"`
+	Token    string
+	UserId   int64
+	ToUserId int64
 }

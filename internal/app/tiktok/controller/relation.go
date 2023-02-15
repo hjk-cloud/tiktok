@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
+	"github.com/hjk-cloud/tiktok/util"
 )
 
 type UserListResponse struct {
@@ -45,10 +46,22 @@ func FollowerList(c *gin.Context) {
 
 // FriendList all users have same friend list
 func FriendList(c *gin.Context) {
+	token := c.Query("token")
+	userId, err := util.JWTAuth(token)
+	if err != nil {
+		writeError(c, err)
+		return
+	}
+	var userList []vo.User
+	if userId == DemoUser.Id {
+		userList = []vo.User{DemoUser, ToDemoUser}
+	} else {
+		userList = []vo.User{ToDemoUser, DemoUser}
+	}
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		UserList: []vo.User{DemoUser, ToDemoUser},
+		UserList: userList,
 	})
 }

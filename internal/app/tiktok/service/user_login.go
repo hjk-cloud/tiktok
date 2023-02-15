@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
 )
@@ -16,7 +16,7 @@ const (
 type LoginFlow struct {
 	Username string
 	Password string
-	User     *entity.UserAuth
+	User     *do.UserAuth
 	UserId   int64
 	Token    string
 }
@@ -75,7 +75,7 @@ func (f *LoginFlow) prepareData() error {
 }
 
 func (f *LoginFlow) packData() error {
-	f.User = &entity.UserAuth{
+	f.User = &do.UserAuth{
 		Id:   f.UserId,
 		Name: f.Username,
 	}

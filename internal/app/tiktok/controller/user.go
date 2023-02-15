@@ -3,14 +3,14 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"net/http"
 	"strconv"
 )
 
 type UserInfoResponse struct {
 	Response
-	UserInfo entity.UserInfo `json:"user"`
+	UserInfo do.UserInfo `json:"user"`
 }
 
 func UserInfo(c *gin.Context) {
@@ -28,4 +28,14 @@ func UserInfo(c *gin.Context) {
 			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})
 	}
+}
+
+var UsersLoginInfo = map[string]User{
+	"zhangleidouyin": {
+		Id:            1,
+		Name:          "zhanglei",
+		FollowCount:   10,
+		FollowerCount: 5,
+		IsFollow:      true,
+	},
 }

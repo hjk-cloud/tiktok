@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -21,10 +21,9 @@ func NewUserInfoDaoInstance() *UserInfoDao {
 	return userInfoDao
 }
 
-func (*UserInfoDao) QueryUserById(id int64) (*entity.UserInfo, error) {
-	var user entity.UserInfo
-	gdb = NewGormDB()
-	err := gdb.Where("id = ?", id).Take(&user).Error
+func (*UserInfoDao) QueryUserById(id int64) (*do.UserInfo, error) {
+	var user do.UserInfo
+	err := Db.Where("id = ?", id).Take(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}

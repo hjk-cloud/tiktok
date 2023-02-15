@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
 )
@@ -10,7 +10,7 @@ import (
 type UserRegisterFlow struct {
 	Username string
 	Password string
-	User     *entity.UserAuth
+	User     *do.UserAuth
 	UserId   int64
 	Token    string
 }
@@ -58,7 +58,7 @@ func (f *UserRegisterFlow) Register() error {
 
 	password := util.Argon2Encrypt(f.Password)
 
-	user := &entity.UserAuth{
+	user := &do.UserAuth{
 		Id:       id,
 		Name:     f.Username,
 		Password: password,
@@ -77,7 +77,7 @@ func (f *UserRegisterFlow) Register() error {
 }
 
 func (f *UserRegisterFlow) packData() error {
-	f.User = &entity.UserAuth{
+	f.User = &do.UserAuth{
 		Id: f.UserId,
 	}
 	return nil

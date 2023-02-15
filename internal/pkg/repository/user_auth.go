@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"errors"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -22,17 +23,16 @@ func NewUserAuthDaoInstance() *UserAuthDao {
 
 func (*UserAuthDao) QueryUserByName(name string) (int, error) {
 	var count int64
-	gdb = NewGormDB()
-	gdb.Model(&entity.UserAuth{}).Where("name = ?", name).Count(&count)
+	Db.Model(&do.UserAuth{}).Where("name = ?", name).Count(&count)
 	return int(count), nil
 }
 
-func (*UserAuthDao) Register(user *entity.UserAuth) error {
-	gdb.Transaction(func(tx *gorm.DB) error {
+func (*UserAuthDao) Register(user *do.UserAuth) error {
+	Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Select("id", "name", "password").Create(&user).Error; err != nil {
 			return err
 		}
-		if err := tx.Select("id", "name").Create(entity.UserInfo{Id: user.Id, Name: user.Name}).Error; err != nil {
+		if err := tx.Select("id", "name").Create(do.UserInfo{Id: user.Id, Name: user.Name}).Error; err != nil {
 			return err
 		}
 		return nil
@@ -41,11 +41,10 @@ func (*UserAuthDao) Register(user *entity.UserAuth) error {
 }
 
 func (*UserAuthDao) Login(name string, password string) (int64, error) {
-	var user entity.UserAuth
-	gdb = NewGormDB()
-	err := gdb.Where("name = ? AND password = ?", name, password).Take(user).Error
+	var user do.UserAuth
+	err := Db.Where("name = ? AND password = ?", name, password).Take(user).Error
 	if err == gorm.ErrRecordNotFound {
-		return 0, err
+		return 0, errors.New("用户名或密码错误")
 	}
 	if err != nil {
 		return 0, err

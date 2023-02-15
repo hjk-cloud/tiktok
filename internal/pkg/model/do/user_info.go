@@ -1,4 +1,4 @@
-package entity
+package do
 
 import "time"
 

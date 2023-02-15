@@ -2,17 +2,17 @@ package service
 
 import (
 	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/entity"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 )
 
 type UserInfoFlow struct {
 	UserId   int64
 	Token    string
-	UserInfo *entity.UserInfo
+	UserInfo *do.UserInfo
 }
 
-func GetUserInfo(token string, userId int64) (*entity.UserInfo, error) {
+func GetUserInfo(token string, userId int64) (*do.UserInfo, error) {
 	return NewUserInfoFlow(token, userId).Do()
 }
 
@@ -20,7 +20,7 @@ func NewUserInfoFlow(token string, userId int64) *UserInfoFlow {
 	return &UserInfoFlow{Token: token, UserId: userId}
 }
 
-func (f *UserInfoFlow) Do() (*entity.UserInfo, error) {
+func (f *UserInfoFlow) Do() (*do.UserInfo, error) {
 	if err := f.checkParam(); err != nil {
 		return nil, err
 	}

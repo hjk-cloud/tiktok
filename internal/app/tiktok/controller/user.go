@@ -5,12 +5,13 @@ import (
 	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 // UsersLoginInfo use map to store user info, and key is username+password for demo
 // user data will be cleared every time the server starts
 // test data: username=zhanglei, password=douyin
-var UsersLoginInfo = map[string]User{
+var UsersLoginInfo = map[string]vo.User{
 	"zhangleidouyin": {
 		Id:            1,
 		Name:          "zhanglei",
@@ -23,14 +24,14 @@ var UsersLoginInfo = map[string]User{
 var userIdSequence = int64(1)
 
 type UserLoginResponse struct {
-	Response
+	vo.Response
 	UserId int64  `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
 type UserResponse struct {
-	Response
-	User User `json:"user"`
+	vo.Response
+	User vo.User `json:"user"`
 }
 
 func Register(c *gin.Context) {
@@ -41,17 +42,17 @@ func Register(c *gin.Context) {
 
 	if _, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
 		atomic.AddInt64(&userIdSequence, 1)
-		newUser := User{
+		newUser := vo.User{
 			Id:   userIdSequence,
 			Name: username,
 		}
 		UsersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			UserId:   userIdSequence,
 			Token:    username + password,
 		})
@@ -66,13 +67,13 @@ func Login(c *gin.Context) {
 
 	if user, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			UserId:   user.Id,
 			Token:    token,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})
 	}
 }
@@ -82,12 +83,12 @@ func UserInfo(c *gin.Context) {
 
 	if user, exist := UsersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			User:     user,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})
 	}
 }

@@ -7,11 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 type VideoListResponse struct {
-	Response
-	VideoList []Video `json:"video_list"`
+	vo.Response
+	VideoList []vo.Video `json:"video_list"`
 }
 
 // Publish check token then save upload file to public directory
@@ -39,7 +40,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, Response{
+	c.JSON(http.StatusOK, vo.Response{
 		StatusCode: 0,
 		StatusMsg:  "uploaded successfully",
 	})
@@ -48,7 +49,7 @@ func Publish(c *gin.Context) {
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	c.JSON(http.StatusOK, VideoListResponse{
-		Response: Response{
+		Response: vo.Response{
 			StatusCode: 0,
 		},
 		VideoList: DemoVideos,
@@ -56,7 +57,7 @@ func PublishList(c *gin.Context) {
 }
 
 func writeError(c *gin.Context, err error) {
-	c.JSON(http.StatusOK, Response{
+	c.JSON(http.StatusOK, vo.Response{
 		StatusCode: 1,
 		StatusMsg:  err.Error(),
 	})

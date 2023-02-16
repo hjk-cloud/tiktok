@@ -13,6 +13,7 @@ import (
 var chatConnMap = sync.Map{}
 
 func RunMessageServer() {
+	fmt.Println("##### RunMessageServer 9090")
 	listen, err := net.Listen("tcp", "127.0.0.1:9090")
 	defer listen.Close()
 	if err != nil {
@@ -33,6 +34,8 @@ func RunMessageServer() {
 
 func process(conn net.Conn) {
 	defer conn.Close()
+
+	fmt.Println("##### Listen Accept process")
 
 	var buf [256]byte
 	for {

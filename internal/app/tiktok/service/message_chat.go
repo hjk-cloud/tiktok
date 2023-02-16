@@ -10,14 +10,35 @@ import (
 	"github.com/hjk-cloud/tiktok/util"
 )
 
-// 获取未读聊条记录
+var (
+	// ua、ub刚进入双方聊天界面时都要拉取全部聊天记录
+	chats map[int64]int64
+)
+
+func init() {
+	chats = make(map[int64]int64)
+}
+
+// 获取聊条记录
+// 无法知道何时退出聊天窗口
 func MessageChat(dto *dto.MessageChatDTO) ([]vo.Message, error) {
-	userId, err := util.JWTAuth(dto.Token)
+	fromUserId, err := util.JWTAuth(dto.Token)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("##### from %d to %d\n", userId, dto.ToUserId)
-	dtos, err := repo.NewMessageRepoInstance().MessageChat(&do.MessageDO{UserId: userId, ToUserId: dto.ToUserId})
+	toUserId := dto.ToUserId
+	fmt.Printf("##### from %d to %d\n", fromUserId, toUserId)
+	var dtos []do.MessageDO
+	if lastToUserId, ok := chats[fromUserId]; ok && lastToUserId == toUserId {
+		// 已在聊天窗口，拉取最新消息
+		dtos, err = repo.NewMessageRepoInstance().MessageUnreadChat(
+			&do.MessageDO{UserId: fromUserId, ToUserId: toUserId})
+	} else {
+		// 刚进聊天窗口，拉取全部消息
+		chats[fromUserId] = toUserId
+		dtos, err = repo.NewMessageRepoInstance().MessageChatAll(
+			&do.MessageDO{UserId: fromUserId, ToUserId: toUserId})
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -34,3 +55,10 @@ func MessageChat(dto *dto.MessageChatDTO) ([]vo.Message, error) {
 	}
 	return ret, nil
 }
+
+// func genChatKey(userIdA int64, userIdB int64) string {
+// 	if userIdA > userIdB {
+// 		return fmt.Sprintf("%d_%d", userIdB, userIdA)
+// 	}
+// 	return fmt.Sprintf("%d_%d", userIdA, userIdB)
+// }

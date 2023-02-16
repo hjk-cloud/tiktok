@@ -40,16 +40,11 @@ func MessageAction(c *gin.Context) {
 }
 
 // MessageChat all users have same follow list
-// 如此轮询：理解为聊天室功能
+// 如此轮询，理解为聊天室功能
+// 且无法知道何时退出了聊天室
 func MessageChat(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
-	// userId, err := util.JWTAuth(token)
-	// if err != nil {
-	// 	c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-	// 	return
-	// }
-	// fmt.Printf("##### from %d to %d\n", userId, userIdB)
 	userIdB, err := strconv.Atoi(toUserId)
 	if err != nil {
 		writeError(c, err)
@@ -64,10 +59,3 @@ func MessageChat(c *gin.Context) {
 
 	c.JSON(http.StatusOK, ChatResponse{Response: vo.Response{StatusCode: 0}, MessageList: messageList})
 }
-
-// func genChatKey(userIdA int64, userIdB int64) string {
-// 	if userIdA > userIdB {
-// 		return fmt.Sprintf("%d_%d", userIdB, userIdA)
-// 	}
-// 	return fmt.Sprintf("%d_%d", userIdA, userIdB)
-// }

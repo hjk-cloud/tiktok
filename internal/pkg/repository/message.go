@@ -48,17 +48,20 @@ func (*MessageRepo) MessageUnreadChat(msg *(do.MessageDO)) ([]do.MessageDO, erro
 }
 
 // 收取双方的全部消息
-func (*MessageRepo) MessageChatAll(msg *(do.MessageDO)) ([]do.MessageDO, error) {
+func (*MessageRepo) MessageChatAll(msgDo *(do.MessageDO)) ([]do.MessageDO, error) {
 	msgs := []do.MessageDO{}
 	var err error
-	err = Db.Where(&do.MessageDO{UserId: msg.UserId, ToUserId: msg.ToUserId}).
-		Or(&do.MessageDO{UserId: msg.ToUserId, ToUserId: msg.UserId}).Find(&msgs).Error
+	err = Db.Where(&do.MessageDO{UserId: msgDo.UserId, ToUserId: msgDo.ToUserId}).
+		Or(&do.MessageDO{UserId: msgDo.ToUserId, ToUserId: msgDo.UserId}).Find(&msgs).Error
 	if err != nil {
 		return msgs, err
 	}
 	msgIds := make([]int64, len(msgs))
 	for i, msg := range msgs {
-		msgIds[i] = msg.Id
+		// 收取到了自己未读的消息，需要更新为已读
+		if msg.ToUserId == msgDo.UserId && !msg.IsRead {
+			msgIds[i] = msg.Id
+		}
 	}
 	err = Db.Table(do.MessageDO{}.TableName()).Where("id IN (?)", msgIds).Updates(&do.MessageDO{IsRead: true}).Error
 	return msgs, err

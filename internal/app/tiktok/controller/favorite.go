@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,6 @@ func FavoriteList(c *gin.Context) {
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		VideoList: DemoVideos,
+		VideoList: repository.DemoVideos,
 	})
 }

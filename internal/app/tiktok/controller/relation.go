@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func FollowList(c *gin.Context) {
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		UserList: []vo.User{DemoUser},
+		UserList: []vo.User{repository.DemoUser},
 	})
 }
 
@@ -39,7 +40,7 @@ func FollowerList(c *gin.Context) {
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		UserList: []vo.User{DemoUser},
+		UserList: []vo.User{repository.DemoUser},
 	})
 }
 
@@ -49,6 +50,6 @@ func FriendList(c *gin.Context) {
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		UserList: []vo.User{DemoUser, ToDemoUser},
+		UserList: []vo.User{repository.DemoUser, repository.ToDemoUser},
 	})
 }

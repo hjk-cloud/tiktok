@@ -18,36 +18,28 @@ type FeedResponse struct {
 
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
-	//c.JSON(http.StatusOK, FeedResponse{
-	//	Response:  Response{StatusCode: 0},
-	//	VideoList: DemoVideos,
-	//	NextTime:  time.Now().Unix(),
-	//})
-
-	//token := c.Param("token")
 	var token string
-	var latestTime time.Time
+	var latestTime int64
 	// 获取请求参数的时间
 	times, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)
-	// 参数校验：有参数用参数，无参数用当前时间
 	if err == nil {
-		//// 如果时间戳超过当前时间，则等于当前时间
-		if times > time.Now().Unix() {
-			latestTime = time.Now()
-		} else {
-			latestTime = time.Unix(times, 0)
-		}
-		fmt.Println("@@@@@Read Time: ", latestTime)
+		fmt.Println("times: ", times)
+		latestTime = times
 	} else {
 		fmt.Println(err)
-		latestTime = time.Now()
+		latestTime = time.Now().Unix()
+	}
+	videos, nextTime, err := service.QueryFeedList(token, latestTime)
+	if err == nil {
+		c.JSON(http.StatusOK, FeedResponse{
+			Response:  model.Response{StatusCode: 0, StatusMsg: "success"},
+			VideoList: videos,
+			NextTime:  nextTime,
+		})
+	} else {
+		c.JSON(http.StatusOK, FeedResponse{
+			Response: model.Response{StatusCode: 1, StatusMsg: err.Error()},
+		})
 	}
 
-	videos, nextTime, _ := service.QueryFeedList(token, latestTime)
-
-	c.JSON(http.StatusOK, FeedResponse{
-		Response:  model.Response{StatusCode: 0, StatusMsg: "success"},
-		VideoList: videos,
-		NextTime:  nextTime,
-	})
 }

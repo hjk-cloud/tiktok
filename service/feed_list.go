@@ -9,29 +9,38 @@ import (
 )
 
 type FeedListFlow struct {
-	LatestTime time.Time
+	Token      string
+	LatestTime int64
 	Videos     []*model.Video
 	NextTime   int64
 }
 
 // QueryFeedList Service层接口，将视频列表返回controller
-func QueryFeedList(token string, latestTime time.Time) ([]model.VideoFlow, int64, error) {
+func QueryFeedList(token string, latestTime int64) ([]model.VideoFlow, int64, error) {
 	return NewFeedListFlow(token, latestTime).Do()
 }
 
-func NewFeedListFlow(token string, latestTime time.Time) *FeedListFlow {
-	return &FeedListFlow{LatestTime: latestTime}
+func NewFeedListFlow(token string, latestTime int64) *FeedListFlow {
+	return &FeedListFlow{Token: token, LatestTime: latestTime}
 }
 
 /**
+0. 校验参数
 1. 获取一组video
 2. model的video需要映射到common的video，所有的video里userid要映射到user类，并加载到video类里
 3. 获取nextTime
 */
 
 func (f *FeedListFlow) Do() ([]model.VideoFlow, int64, error) {
+	// 0. 如果时间戳超过当前时间，则等于当前时间
+	if f.LatestTime > time.Now().Unix() {
+		f.LatestTime = time.Now().Unix()
+	}
+	//fmt.Println("@@@@@Read Time: ", f.LatestTime)
+
 	// 1.
-	videos, err := dao.NewVideoDaoInstance().MQueryVideoByLastTime(f.LatestTime)
+	lt := time.Unix(f.LatestTime, 0)
+	videos, err := dao.NewVideoDaoInstance().MQueryVideoByLastTime(lt)
 	if err != nil {
 		log.Print(err)
 	}
@@ -63,6 +72,6 @@ func (f *FeedListFlow) Do() ([]model.VideoFlow, int64, error) {
 		nextTime = time.Now()
 	}
 
-	fmt.Println("feed_list:66 | Next time:", nextTime, nextTime.Unix())
+	fmt.Println("feed_list:74 | Next time:", nextTime, nextTime.Unix())
 	return videoFlows, nextTime.Unix(), err
 }

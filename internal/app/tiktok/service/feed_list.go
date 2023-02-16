@@ -48,19 +48,36 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 	// 2.
 	var videoFlows []vo.VideoVO
 	for i := 0; i < len(videos); i++ {
-		var videoFlow vo.VideoVO
+		// 2.1 遍历视频列表
 		video := videos[i]
+		// 2.2 获取视频作者信息
+		var userInfoDao *repository.UserInfoDao
+		user, err := userInfoDao.QueryUserById(video.AuthorId)
+		if err != nil {
+			log.Print(err)
+		}
+		var userVO vo.UserVO
+		userVO = vo.UserVO{
+			Id:            user.Id,
+			Name:          user.Name,
+			FollowCount:   user.FollowCount,
+			FollowerCount: user.FollowerCount,
+			// [TO DO] 需要关注接口
+			IsFollow: false,
+		}
+		// 2.3 映射视频VO信息
+		var videoFlow vo.VideoVO
 		videoFlow = vo.VideoVO{
-			Id: video.Id,
-			// 空对象，待实现：需要用到user.service
-			Author:        repository.DemoUser,
+			Id:            video.Id,
+			Author:        userVO,
 			PlayUrl:       video.PlayUrl,
 			CoverUrl:      video.CoverUrl,
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
-			// 默认值，需要识别用户+是否点赞service
-			IsFavorite: true,
+			// [TO DO]: 默认值，需要识别用户+是否点赞service
+			IsFavorite: false,
 		}
+		// 2.4
 		videoFlows = append(videoFlows, videoFlow)
 	}
 

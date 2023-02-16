@@ -9,6 +9,7 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
+	"github.com/hjk-cloud/tiktok/util"
 )
 
 type ChatResponse struct {
@@ -21,13 +22,13 @@ func MessageAction(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
 	content := c.Query("content")
-	user, exist := UsersLoginInfo[token]
-	if !exist {
+	userId, err := util.JWTAuth(token)
+	if err != nil {
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
 	userIdB, _ := strconv.Atoi(toUserId)
-	msg := &dto.MessageActionDTO{UserId: user.Id, ToUserId: int64(userIdB), MsgContent: content}
+	msg := &dto.MessageActionDTO{UserId: userId, ToUserId: int64(userIdB), MsgContent: content}
 	if msgId, err := service.MessageAction(msg); err != nil {
 		writeError(c, err)
 		return
@@ -39,26 +40,22 @@ func MessageAction(c *gin.Context) {
 }
 
 // MessageChat all users have same follow list
-// 如此轮询：理解为聊天室功能
+// 如此轮询，理解为聊天室功能
+// 且无法知道何时退出了聊天室
 func MessageChat(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
-	user, exist := UsersLoginInfo[token]
-	if !exist {
-		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	userIdB, err := strconv.Atoi(toUserId)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
-	userIdB, _ := strconv.Atoi(toUserId)
-	fmt.Printf("##### from %d to %d\n", user.Id, userIdB)
-	msg := &dto.MessageChatDTO{UserId: user.Id, ToUserId: int64(userIdB)}
-	messageList := service.MessageChat(msg)
+	msg := &dto.MessageChatDTO{Token: token, ToUserId: int64(userIdB)}
+	messageList, err := service.MessageChat(msg)
+	if err != nil {
+		writeError(c, err)
+		return
+	}
 
 	c.JSON(http.StatusOK, ChatResponse{Response: vo.Response{StatusCode: 0}, MessageList: messageList})
 }
-
-// func genChatKey(userIdA int64, userIdB int64) string {
-// 	if userIdA > userIdB {
-// 		return fmt.Sprintf("%d_%d", userIdB, userIdA)
-// 	}
-// 	return fmt.Sprintf("%d_%d", userIdA, userIdB)
-// }

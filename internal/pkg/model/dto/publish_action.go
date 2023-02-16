@@ -11,6 +11,4 @@ type PublishActionDTO struct {
 	Token   string
 	Title   string
 	Data    *multipart.FileHeader
-
-	UserId int64
 }

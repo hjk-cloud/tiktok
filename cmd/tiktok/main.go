@@ -11,7 +11,7 @@ import (
 // config 要在 repository 前 init
 
 func main() {
-	//go service.RunMessageServer() // 结束时需要关闭、让出端口
+	// go service.RunMessageServer()	// 另一种消息实现方案，未实现
 	r := gin.Default()
 
 	initRouter(r)

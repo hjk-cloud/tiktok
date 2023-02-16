@@ -26,16 +26,16 @@ var DemoComments = []vo.Comment{
 }
 
 var DemoUser = vo.User{
-	Id:            1,
-	Name:          "TestUser",
+	Id:            219526910052663296,
+	Name:          "xhm0215",
 	FollowCount:   0,
 	FollowerCount: 0,
 	IsFollow:      false,
 }
 
 var ToDemoUser = vo.User{
-	Id:            219520551441268736,
-	Name:          "TestUserTo",
+	Id:            219526947737960448,
+	Name:          "xhm02151",
 	FollowCount:   0,
 	FollowerCount: 0,
 	IsFollow:      false,

@@ -37,12 +37,11 @@ import (
 func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 	video := &do.VideoDO{Title: strings.TrimSpace(f.Title), FavoriteCount: 0, CommentCount: 0, Status: 0}
 
-	// // 是否登录放入service会导致循环引用，UsersLoginInfo不应该放controller？
-	// if user, exist := controller.UsersLoginInfo[f.Token]; !exist {
-	// 	return -1, errors.New("User doesn't exist")
-	// } else {
-	// 	video.AuthorId = user.Id
-	// }
+	if userId, err := util.JWTAuth(f.Token); err != nil {
+		return -1, errors.New("User doesn't exist")
+	} else {
+		video.AuthorId = userId
+	}
 
 	// HashValue
 	if hashVal, err := getHashValue(f.Data); err != nil {

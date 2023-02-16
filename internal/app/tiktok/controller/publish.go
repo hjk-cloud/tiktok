@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,15 +17,6 @@ type VideoListResponse struct {
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
-	// TODO：检查是否登录，放入service会导致循环引用，UsersLoginInfo不应该放controller？
-	var userId int64
-	if user, exist := UsersLoginInfo[token]; !exist {
-		writeError(c, errors.New("User doesn't exist"))
-		return
-	} else {
-		userId = user.Id
-	}
-
 	title := c.PostForm("title")
 	data, err := c.FormFile("data")
 	if err != nil {
@@ -35,7 +24,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	p := &dto.PublishActionDTO{Context: c, Token: token, Title: title, Data: data, UserId: userId}
+	p := &dto.PublishActionDTO{Context: c, Token: token, Title: title, Data: data}
 	if _, err := service.PublishAction(p); err != nil {
 		writeError(c, err)
 		return
@@ -53,6 +42,6 @@ func PublishList(c *gin.Context) {
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		VideoList: repository.DemoVideos,
+		VideoList: DemoVideos,
 	})
 }

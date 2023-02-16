@@ -3,3 +3,5 @@
     util.JWTAuth(token string) (int64, error)
 
 根据id获取用户信息
+    
+    service.GetUserInfoById(userId int64) (*do.UserInfo, error)

@@ -46,3 +46,13 @@ func GetUserInfo(r *dto.UserLoginDTO) (*do.UserInfo, error) {
 
 	return user, nil
 }
+
+func GetUserInfoById(userId int64) (*do.UserInfo, error) {
+	userDao := repo.NewUserInfoDaoInstance()
+
+	if user, err := userDao.QueryUserById(userId); err != nil {
+		return nil, err
+	} else {
+		return user, err
+	}
+}

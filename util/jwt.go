@@ -56,7 +56,7 @@ func ParseToken(tokenString string) (claims *MyClaims, err error) {
 	return
 }
 
-// JWTAuth 用于验证token，并返回token对应的username
+// JWTAuth 用于验证token，并返回token对应的userId
 func JWTAuth(token string) (int64, error) {
 	if token == "" {
 		return 0, errors.New("token为空")

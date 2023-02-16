@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
-	"net/http"
 )
 
 type UserLoginResponse struct {
@@ -17,17 +19,16 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	user, err := service.UserRegister(username, password)
-
-	if err == nil {
+	r := &dto.UserAuthDTO{Username: username, Password: password}
+	if user, err := service.UserRegister(r); err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: vo.Response{StatusCode: 1, StatusMsg: err.Error()},
+		})
+	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: vo.Response{StatusCode: 0},
 			UserId:   user.UserId,
 			Token:    user.Token,
-		})
-	} else {
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: vo.Response{StatusCode: 1, StatusMsg: err.Error()},
 		})
 	}
 }
@@ -36,7 +37,8 @@ func Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	user, err := service.UserLogin(username, password)
+	r := &dto.UserAuthDTO{Username: username, Password: password}
+	user, err := service.UserLogin(r)
 
 	if err == nil {
 		c.JSON(http.StatusOK, UserLoginResponse{

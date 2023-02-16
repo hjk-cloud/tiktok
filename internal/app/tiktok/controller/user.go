@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 type UserInfoResponse struct {
@@ -20,7 +21,8 @@ func UserInfo(c *gin.Context) {
 	userId, _ := strconv.ParseInt(userIdString, 10, 64)
 	token := c.Query("token")
 
-	if user, err := service.GetUserInfo(token, userId); err == nil {
+	r := &dto.UserLoginDTO{UserId: userId, Token: token}
+	if user, err := service.GetUserInfo(r); err == nil {
 		c.JSON(http.StatusOK, UserInfoResponse{
 			Response: vo.Response{StatusCode: 0},
 			UserInfo: *user,

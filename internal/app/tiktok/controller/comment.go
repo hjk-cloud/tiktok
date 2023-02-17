@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,6 @@ func CommentAction(c *gin.Context) {
 func CommentList(c *gin.Context) {
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    vo.Response{StatusCode: 0},
-		CommentList: DemoComments,
+		CommentList: repository.DemoComments,
 	})
 }

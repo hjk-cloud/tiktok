@@ -13,8 +13,8 @@ type VideoDO struct {
 	Title         string     // 自动映射成title
 	PlayUrl       string     // 自动映射成play_url
 	CoverUrl      string     // 自动映射成cover_url
-	FavoriteCount int        // 自动映射成favorite_count
-	CommentCount  int        // 自动映射成comment_count
+	FavoriteCount int64      // 自动映射成favorite_count
+	CommentCount  int64      // 自动映射成comment_count
 	Status        byte       // 自动映射成status
 	HashValue     string     `gorm:"column:hash;"` // 自动映射成hash_value，不一致，所以要手动指定
 	CreateTime    time.Time  // 自动映射成create_time

@@ -28,18 +28,22 @@ var (
 	Config ConfigStruct
 )
 
+const (
+	FeedMaxNum = 5
+)
+
 func init() {
-	LoadConfig()
+	workDir, _ := os.Getwd() //获取目录对应的路径
+	LoadConfig(workDir + "/../../config")
 }
 
-func LoadConfig() {
+func LoadConfig(fileDir string) {
 	fmt.Println("#####config.init()")
-	workDir, _ := os.Getwd()                       //获取目录对应的路径
-	viper.SetConfigName("tiktok")                  //配置文件名
-	viper.SetConfigType("yaml")                    //配置文件类型
-	viper.AddConfigPath(workDir + "/../../config") //执行go run对应的路径配置
+	viper.SetConfigName("tiktok") //配置文件名
+	viper.SetConfigType("yaml")   //配置文件类型
+	viper.AddConfigPath(fileDir)  //执行go run对应的路径配置
 	//viper.AddConfigPath(workDir+"/src/gin_application"+"/config") //执行单文件运行，
-	fmt.Println(workDir+"../../config", workDir)
+	fmt.Println(fileDir)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

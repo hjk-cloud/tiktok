@@ -12,6 +12,8 @@ type UserInfo struct {
 	Address       string `json:address,omitempty`
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
+	FavoriteCount int64  `json:"favorite_count,omitempty"`
+	PublishCount  int64  `json:"publish_count,omitempty"`
 	isDelete      int8   `json:is_delete,omitempty`
 	CreateTime    time.Time
 	updateTime    time.Time

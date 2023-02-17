@@ -2,6 +2,8 @@ package do
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type VideoDO struct {
@@ -21,4 +23,11 @@ type VideoDO struct {
 
 func (VideoDO) TableName() string {
 	return "t_video" // 自动映射成`videos`，不一致，所以要这样指定
+}
+
+// 注意，在 GORM 中保存、删除操作会默认运行在事务上。
+// 因此在事务完成之前该事务中所作的更改是不可见的，如果您的钩子返回了任何错误，则修改将被回滚。
+// 投稿后作品数+1
+func (v *VideoDO) AfterCreate(tx *gorm.DB) (err error) {
+	return tx.Model(&UserInfo{Id: v.AuthorId}).Update("publish_count", gorm.Expr("publish_count + 1")).Error
 }

@@ -28,7 +28,9 @@ func setDsn() {
 func init() {
 	fmt.Println("#####repository.database.init()")
 	setDsn()
-	db, err := gorm.Open(mysql.Open(dsn))
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 	if err != nil {
 		log.Panicln(err)
 		// panic(err)

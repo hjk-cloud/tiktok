@@ -1,47 +1,112 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
+	"dao"
+	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/hjk-cloud/tiktok/service"
 )
 
 type CommentListResponse struct {
 	Response
-	CommentList []Comment `json:"comment_list,omitempty"`
+	CommentList []dao.Comment `json:"comment_list,omitempty"`
 }
 
 type CommentActionResponse struct {
 	Response
-	Comment Comment `json:"comment,omitempty"`
+	Comment dao.Comment `json:"comment,omitempty"`
 }
 
-// CommentAction no practical effect, just check if token is valid
+// CommentAction 新增/删除评论
 func CommentAction(c *gin.Context) {
-	token := c.Query("token")
+	//从上下文中获取执行当前操作的用户的id
+	//调用晴姐的接口
+	id, ok := getId(c)
+	if !ok {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "获取用户id失败，请重试"})
+		return
+	}
+
+	//获取执行操作的视频id
+	videoId, err := strconv.ParseInt(c.Query("video_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "获取视频id失败"})
+		log.Println("出现无法解析成64位整数的视频id")
+		return
+	}
+
+	//获取当前操作类型
 	actionType := c.Query("action_type")
 
-	if user, exist := usersLoginInfo[token]; exist {
-		if actionType == "1" {
-			text := c.Query("comment_text")
-			c.JSON(http.StatusOK, CommentActionResponse{Response: Response{StatusCode: 0},
-				Comment: Comment{
-					Id:         1,
-					User:       user,
-					Content:    text,
-					CreateDate: "05-01",
-				}})
+	if actionType == "1" { //增加评论
+		commentText := c.Query("comment_text")
+		comment, err := service.Comment(videoId, id, commentText)
+		if err != nil {
+			c.JSON(http.StatusOK, CommentActionResponse{
+				Response: Response{StatusCode: 1, StatusMsg: "评论异常"},
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, CommentActionResponse{
+				Response: Response{StatusCode: 0},
+				Comment:  comment,
+			})
 			return
 		}
-		c.JSON(http.StatusOK, Response{StatusCode: 0})
-	} else {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	} else if actionType == "2" { //删除评论
+		commentId, err := strconv.ParseInt(c.Query("comment_id"), 10, 64)
+		if err != nil {
+			c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "获取评论id失败"})
+			log.Println("出现无法解析成64位整数的视频id")
+			return
+		}
+		err = service.DeleteComment(commentId)
+		if err != nil {
+			c.JSON(http.StatusOK, CommentActionResponse{
+				Response: Response{StatusCode: 1, StatusMsg: "删除评论异常"},
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, CommentActionResponse{
+				Response: Response{StatusCode: 0},
+			})
+		}
 	}
+
 }
 
-// CommentList all videos have same demo comment list
+func getId(c *gin.Context) {
+	panic("unimplemented")
+}
+
+// CommentList 获取评论列表
 func CommentList(c *gin.Context) {
+	//确认视频id无误
+	videoId, err := strconv.ParseInt(c.Query("video_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "获取视频id失败"})
+		log.Println("出现无法解析成64位整数的视频id")
+		return
+	}
+
+	//获取commentList
+	commentList, err := service.CommentList(videoId)
+	if err != nil {
+		c.JSON(http.StatusOK, CommentListResponse{
+			Response: Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			},
+			CommentList: nil,
+		})
+	}
+
+	//返回commentList
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
-		CommentList: DemoComments,
+		CommentList: commentList,
 	})
 }

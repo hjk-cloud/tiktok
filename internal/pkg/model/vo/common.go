@@ -37,8 +37,8 @@ type Message struct {
 	ToUserId   int64  `json:"to_user_id"`
 	Content    string `json:"content,omitempty"`
 	CreateTime int64  `json:"create_time,omitempty"`
-	FirstRead  bool
-	SecondRead bool
+	// FirstRead  bool
+	// SecondRead bool
 }
 
 type MessageSendEvent struct {

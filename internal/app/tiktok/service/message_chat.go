@@ -105,8 +105,9 @@ func MessageChat(dto *dto.MessageChatDTO) ([]vo.Message, error) {
 			FromUserId: dtos[i].UserId,
 			ToUserId:   dtos[i].ToUserId,
 			Content:    dtos[i].Content,
-			CreateTime: dtos[i].CreateTime.Unix(), // 秒数
+			CreateTime: dtos[i].CreateTime.UnixMilli(), // 毫秒数
 		}
 	}
+	log.Printf("#####%#v", ret)
 	return ret, nil
 }

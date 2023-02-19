@@ -3,7 +3,6 @@ package controller
 import (
 	"errors"
 	"log"
-	"math"
 	"net/http"
 	"strconv"
 
@@ -51,9 +50,9 @@ func MessageChat(c *gin.Context) {
 	lastTime, err := strconv.ParseInt(preMsgTime, 10, 64)
 	log.Println("##### 时间转换", preMsgTime, lastTime)
 	// 秒是10位数, 毫秒是13位数。客户端传过来单位不一致？
-	if lastTime < int64(math.Pow10(12)) {
-		lastTime *= 1000
-	}
+	// if lastTime < int64(math.Pow10(12)) {
+	// 	lastTime *= 1000
+	// }
 	if err != nil {
 		writeError(c, errors.New("Invalid pre_msg_time"))
 		return

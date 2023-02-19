@@ -26,7 +26,7 @@ func setDsn() {
 
 // database
 func init() {
-	fmt.Println("#####repository.database.init()")
+	log.Println("#####repository.database.init()")
 	setDsn()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
@@ -40,7 +40,7 @@ func init() {
 
 // redis
 func init() {
-	fmt.Println("#####repository.redis.init()")
+	log.Println("#####repository.redis.init()")
 }
 
 // func init() {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -17,7 +16,7 @@ func main() {
 	days := time.Duration(1)
 	earliest := time.Now().Local().Add(-days * 24 * time.Hour)
 	year, month, day := earliest.Year(), int(earliest.Month()), earliest.Day()
-	fmt.Println(config.Config.StaticDir, "###删到", year, month, day)
+	log.Println(config.Config.StaticDir, "###删到", year, month, day)
 
 	yfiles, err := ioutil.ReadDir(config.Config.StaticDir)
 	if err != nil {
@@ -25,7 +24,7 @@ func main() {
 	}
 	// 所有年
 	for _, yf := range yfiles {
-		// fmt.Println(yf.Name())
+		// log.Println(yf.Name())
 		y, err := strconv.Atoi(yf.Name())
 		if err != nil {
 			log.Println(err)
@@ -33,7 +32,7 @@ func main() {
 		}
 		ypath := path.Join(config.Config.StaticDir, yf.Name())
 		if y < year {
-			fmt.Println("删除", ypath)
+			log.Println("删除", ypath)
 			os.RemoveAll(ypath)
 			continue
 		}
@@ -47,7 +46,7 @@ func main() {
 		}
 		// 所有月
 		for _, mf := range mfiles {
-			// fmt.Println(mf.Name())
+			// log.Println(mf.Name())
 			m, err := strconv.Atoi(mf.Name())
 			if err != nil {
 				log.Println(err)
@@ -55,7 +54,7 @@ func main() {
 			}
 			mpath := path.Join(ypath, mf.Name())
 			if m < month {
-				fmt.Println("删除", mpath)
+				log.Println("删除", mpath)
 				os.RemoveAll(mpath)
 				continue
 			}
@@ -69,7 +68,7 @@ func main() {
 			}
 			// 所有日
 			for _, df := range dfiles {
-				// fmt.Println(mf.Name())
+				// log.Println(mf.Name())
 				d, err := strconv.Atoi(df.Name())
 				if err != nil {
 					log.Println(err)
@@ -77,7 +76,7 @@ func main() {
 				}
 				dpath := path.Join(mpath, df.Name())
 				if d <= day {
-					fmt.Println("删除", dpath)
+					log.Println("删除", dpath)
 					os.RemoveAll(dpath)
 					continue
 				}

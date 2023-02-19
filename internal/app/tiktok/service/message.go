@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"sync"
 
@@ -13,18 +14,18 @@ import (
 var chatConnMap = sync.Map{}
 
 func RunMessageServer() {
-	fmt.Println("##### RunMessageServer 9090")
+	log.Println("##### RunMessageServer 9090")
 	listen, err := net.Listen("tcp", "127.0.0.1:9090")
 	defer listen.Close()
 	if err != nil {
-		fmt.Printf("Run message sever failed: %v\n", err)
+		log.Printf("Run message sever failed: %v\n", err)
 		return
 	}
 
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
-			fmt.Printf("Accept conn failed: %v\n", err)
+			log.Printf("Accept conn failed: %v\n", err)
 			continue
 		}
 
@@ -35,7 +36,7 @@ func RunMessageServer() {
 func process(conn net.Conn) {
 	defer conn.Close()
 
-	fmt.Println("##### Listen Accept process")
+	log.Println("##### Listen Accept process")
 
 	var buf [256]byte
 	for {
@@ -44,14 +45,14 @@ func process(conn net.Conn) {
 			if err == io.EOF {
 				break
 			}
-			fmt.Printf("Read message failed: %v\n", err)
+			log.Printf("Read message failed: %v\n", err)
 			continue
 		}
 
 		// UserId 发送给 ToUserId
 		var event = dto.MessageSendEvent{}
 		_ = json.Unmarshal(buf[:n], &event)
-		fmt.Printf("Receive Message：%+v\n", event)
+		log.Printf("Receive Message：%+v\n", event)
 
 		fromChatKey := fmt.Sprintf("%d_%d", event.UserId, event.ToUserId)
 		if len(event.MsgContent) == 0 {
@@ -63,7 +64,7 @@ func process(conn net.Conn) {
 		toChatKey := fmt.Sprintf("%d_%d", event.ToUserId, event.UserId)
 		writeConn, exist := chatConnMap.Load(toChatKey)
 		if !exist {
-			fmt.Printf("User %d offline\n", event.ToUserId)
+			log.Printf("User %d offline\n", event.ToUserId)
 			continue
 		}
 
@@ -74,7 +75,7 @@ func process(conn net.Conn) {
 		pushData, _ := json.Marshal(pushEvent)
 		_, err = writeConn.(net.Conn).Write(pushData)
 		if err != nil {
-			fmt.Printf("Push message failed: %v\n", err)
+			log.Printf("Push message failed: %v\n", err)
 		}
 	}
 }

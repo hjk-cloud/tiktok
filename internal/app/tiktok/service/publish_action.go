@@ -68,7 +68,7 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 	}
 
 	video.CreateTime = time.Now().Local() // mysql设置的默认值用不到？
-	fmt.Printf("Video: %+v\n", video)
+	log.Printf("Video: %+v\n", video)
 	if err := checkVideo(video, localVideoPath); err != nil {
 		return -1, err
 	}
@@ -99,7 +99,7 @@ func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) 
 
 	playUrl, err := util.Upload(saveFile, videoPath)
 
-	// fmt.Println(playUrl, videoPath)
+	// log.Println(playUrl, videoPath)
 	return playUrl, videoPath, err
 }
 
@@ -124,8 +124,8 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	// ffmpeg -i tiktok.mp4 -vframes 1 -f image2 cover-%03d.png
 	dotIdx := strings.LastIndex(videoPath, ".")
 	imgPath := videoPath[:dotIdx] + "-cover.png"
-	// fmt.Println("视频路径", config.STATIC_DIR+videoPath)
-	// fmt.Println("封面路径", config.STATIC_DIR+imgPath)
+	// log.Println("视频路径", config.STATIC_DIR+videoPath)
+	// log.Println("封面路径", config.STATIC_DIR+imgPath)
 	finalPath := config.Config.StaticDir + imgPath
 	cmd := exec.Command("ffmpeg", "-i", config.Config.StaticDir+videoPath, "-vframes", strconv.Itoa(frameNumber), "-f", "image2", finalPath)
 	if err := cmd.Run(); err != nil {
@@ -133,7 +133,7 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 		return "", imgPath, err
 	}
 	coverUrl, err := util.Upload(finalPath, imgPath)
-	// fmt.Println(coverUrl, imgPath)
+	// log.Println(coverUrl, imgPath)
 	return coverUrl, imgPath, err
 }
 
@@ -157,7 +157,7 @@ func checkVideo(video *do.VideoDO, localVideoPath string) error {
 		return err
 	}
 	// 1GB
-	fmt.Println("###文件大小：", float64(fi.Size())/1024/1024, "MB")
+	log.Println("###文件大小：", float64(fi.Size())/1024/1024, "MB")
 	if fi.Size() > 1024*1024*1024 {
 		return errors.New("视频文件太大！")
 	}
@@ -168,7 +168,7 @@ func checkVideo(video *do.VideoDO, localVideoPath string) error {
 		panic(err)
 	}
 	duration, err := util.GetMP4Duration(file)
-	fmt.Println("#####################检查视频", realVideoPath, duration, "seconds")
+	log.Println("#####################检查视频", realVideoPath, duration, "seconds")
 	if err != nil {
 		return err
 	}

@@ -50,26 +50,33 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 	for i := 0; i < len(videos); i++ {
 		// 2.1 遍历视频列表
 		video := videos[i]
-		// 2.2 获取视频作者信息
+		//2.2 获取视频作者信息
 		var userInfoDao *repository.UserInfoDao
+		var userVO vo.User
+
 		user, err := userInfoDao.QueryUserById(video.AuthorId)
 		if err != nil {
 			log.Print(err)
 		}
-		var userVO vo.UserVO
-		userVO = vo.UserVO{
-			Id:            user.Id,
-			Name:          user.Name,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-			// [TO DO] 需要关注接口
-			IsFollow: false,
+		// 若user为空，则无此用户，Video内部User赋空值
+		if user != nil {
+			userVO = vo.User{
+				Id:            user.Id,
+				Name:          user.Name,
+				FollowCount:   user.FollowCount,
+				FollowerCount: user.FollowerCount,
+				// [TO DO] 需要关注接口
+				IsFollow: false,
+			}
 		}
+		log.Println(userVO)
+
 		// 2.3 映射视频VO信息
 		var videoFlow vo.VideoVO
 		videoFlow = vo.VideoVO{
-			Id:            video.Id,
-			Author:        userVO,
+			Id:     video.Id,
+			Author: userVO,
+			//Author:        repository.DemoUser,
 			PlayUrl:       video.PlayUrl,
 			CoverUrl:      video.CoverUrl,
 			FavoriteCount: video.FavoriteCount,

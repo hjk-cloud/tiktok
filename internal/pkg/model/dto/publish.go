@@ -12,3 +12,8 @@ type PublishActionDTO struct {
 	Title   string
 	Data    *multipart.FileHeader
 }
+
+type PublishListDTO struct {
+	Token  string
+	UserId int64
+}

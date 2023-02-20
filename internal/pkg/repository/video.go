@@ -103,3 +103,13 @@ func (*VideoRepo) MQueryVideoByLastTime(latestTime time.Time) ([]do.VideoDO, err
 	}
 	return videos, nil
 }
+
+func (*VideoRepo) QueryVideoByAuthorId(userId int64) ([]do.VideoDO, error) {
+	videos := []do.VideoDO{}
+	var err error
+	err = Db.Where(do.VideoDO{AuthorId: userId}, map[string]interface{}{"Status": 0}).Find(&videos).Error
+	if err == gorm.ErrRecordNotFound {
+		return videos, nil
+	}
+	return videos, err
+}

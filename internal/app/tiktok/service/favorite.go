@@ -8,14 +8,9 @@ import (
 	"github.com/hjk-cloud/tiktok/util"
 )
 
-func GetFavoriteStatus(subjectId, objectId int64) (bool, error) {
+func GetFavoriteStatus(subjectId, objectId int64) bool {
 	favorite := &do.Favorite{SubjectId: subjectId, ObjectId: objectId, ObjectType: "video"}
-
-	if status, err := repo.NewFavoriteDaoInstance().QueryFavoriteStatus(favorite); err != nil {
-		return false, err
-	} else {
-		return status, nil
-	}
+	return repo.NewFavoriteDaoInstance().QueryFavoriteStatus(favorite)
 }
 
 func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {

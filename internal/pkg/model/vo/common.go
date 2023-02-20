@@ -24,11 +24,17 @@ type Comment struct {
 }
 
 type User struct {
-	Id            int64  `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	FollowCount   int64  `json:"follow_count,omitempty"`
-	FollowerCount int64  `json:"follower_count,omitempty"`
-	IsFollow      bool   `json:"is_follow,omitempty"`
+	Id              int64  `json:"id,omitempty"`
+	Name            string `json:"name,omitempty"`
+	FollowCount     int64  `json:"follow_count,omitempty"`
+	FollowerCount   int64  `json:"follower_count,omitempty"`
+	IsFollow        bool   `json:"is_follow,omitempty"`
+	Avatar          string
+	BackgroundImage string
+	signature       string
+	TotalFavorited  int64
+	WorkCount       int64
+	FavoriteCount   int64
 }
 
 // 接口文档有问题，先自行调整

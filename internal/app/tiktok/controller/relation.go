@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
@@ -16,11 +19,15 @@ type UserListResponse struct {
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
 	token := c.Query("token")
+	toUserIdString := c.Query("to_user_id")
+	actionType := c.Query("action_type")
+	toUserId, _ := strconv.ParseInt(toUserIdString, 10, 64)
+	r := &dto.FollowActionDTO{Token: token, ToUserId: toUserId, ActionType: actionType == "1"}
 
-	if _, exist := UsersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, vo.Response{StatusCode: 0})
+	if err := service.UpdateFollowStatus(r); err != nil {
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
 	} else {
-		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "success"})
 	}
 }
 

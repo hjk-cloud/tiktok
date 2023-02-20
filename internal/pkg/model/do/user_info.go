@@ -14,7 +14,7 @@ type UserInfo struct {
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	FavoriteCount int64  `json:"favorite_count,omitempty"`
 	PublishCount  int64  `json:"publish_count,omitempty"`
-	isDelete      int8   `json:is_delete,omitempty`
+	isDeleted     int8   `json:is_delete,omitempty`
 	CreateTime    time.Time
 	updateTime    time.Time
 }

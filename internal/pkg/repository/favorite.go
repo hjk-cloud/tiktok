@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"sync"
 )
@@ -21,11 +20,9 @@ func NewFavoriteDaoInstance() *FavoriteDao {
 	return favoriteDao
 }
 
-func (*FavoriteDao) QueryFavoriteStatus(favorite *do.Favorite) (bool, error) {
-	if err := Db.Where("subject_id = ? AND object_id = ? AND object_type = ?", favorite.SubjectId, favorite.ObjectId, favorite.ObjectType).Take(&favorite); err != nil {
-		return false, errors.New("无该记录")
-	}
-	return true, nil
+func (*FavoriteDao) QueryFavoriteStatus(favorite *do.Favorite) bool {
+	result := Db.Where("subject_id = ? AND object_id = ? AND object_type = ?", favorite.SubjectId, favorite.ObjectId, favorite.ObjectType).Take(&favorite)
+	return result.RowsAffected == 1
 }
 
 func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) int64 {

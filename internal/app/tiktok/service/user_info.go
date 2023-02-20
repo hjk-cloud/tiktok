@@ -2,57 +2,36 @@ package service
 
 import (
 	"errors"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 )
 
-func GetUserInfo(r *dto.UserLoginDTO) (*do.UserInfo, error) {
+func GetUserInfo(r *dto.UserLoginDTO) (vo.User, error) {
+	var user vo.User
 	if r.UserId == 0 {
-		return nil, errors.New("id为空")
+		return user, errors.New("id为空")
 	}
 
 	userDao := repo.NewUserInfoDaoInstance()
 
-	user, err := userDao.QueryUserById(r.UserId)
+	userInfo, err := userDao.QueryUserById(r.UserId)
 	if err != nil {
-		return nil, err
+		return user, err
 	}
-	//relationDao := models.NewRelationDaoInstance()
-	//favoriteDao := models.NewFavoriteDaoInstance()
-	//videoDao := models.NewVideoDaoInstance()
-	//var totalFavorited = 0
-
-	////关注数
-	//followCount, err := relationDao.QueryRelationCountByUserId(f.UserId)
-	//if err != nil {
-	//	return err
-	//}
-	//f.FollowCount = followCount
-	////粉丝数
-	//followerCount, err := relationDao.QueryRelationCountByToUserId(f.UserId)
-	//if err != nil {
-	//	return err
-	//}
-	//f.FollowerCount = followerCount
-	////获赞数
-	//videoIds := videoDao.QueryPublishVideoList(f.UserId)
-	//for i := range videoIds {
-	//	totalFavorited += favoriteDao.QueryVideoFavoriteCount(videoIds[i])
-	//}
-	//f.TotalFavorited = totalFavorited
-	////喜欢数
-	//f.FavoriteCount = favoriteDao.QueryUserFavoriteCount(f.UserId)
-
+	user = vo.User{Id: userInfo.Id, Name: userInfo.Name, FavoriteCount: userInfo.FavoriteCount, FollowCount: userInfo.FollowCount, FollowerCount: userInfo.FollowerCount, WorkCount: userInfo.PublishCount}
 	return user, nil
 }
 
-func GetUserInfoById(userId int64) (*do.UserInfo, error) {
+func GetUserInfoById(subjectId, objectId int64) (vo.User, error) {
+	var user vo.User
 	userDao := repo.NewUserInfoDaoInstance()
 
-	if user, err := userDao.QueryUserById(userId); err != nil {
-		return nil, err
-	} else {
+	userInfo, err := userDao.QueryUserById(objectId)
+	if err != nil {
 		return user, err
 	}
+	user = vo.User{Id: userInfo.Id, Name: userInfo.Name, FavoriteCount: userInfo.FavoriteCount, FollowCount: userInfo.FollowCount, FollowerCount: userInfo.FollowerCount, WorkCount: userInfo.PublishCount}
+	user.IsFollow = GetFollowStatus(subjectId, objectId)
+	return user, nil
 }

@@ -25,16 +25,20 @@ func (*FavoriteDao) QueryFavoriteStatus(favorite *do.Favorite) bool {
 	return result.RowsAffected == 1
 }
 
-func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) int64 {
+func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) (int64, error) {
 	var count int64
-	Db.Model(&favorite).Where("object_id = ? AND object_type = ?", objectId, objectType).Count(&count)
-	return count
+	if err := Db.Model(&favorite).Where("object_id = ? AND object_type = ?", objectId, objectType).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
-func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) int64 {
+func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int64, error) {
 	var count int64
-	Db.Model(&favorite).Where("subject_id = ? AND object_type = ?", subjectId, objectType).Count(&count)
-	return count
+	if err := Db.Model(&favorite).Where("subject_id = ? AND object_type = ?", subjectId, objectType).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (*FavoriteDao) Insert(favorite *do.Favorite) error {

@@ -38,6 +38,10 @@ func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {
 //
 //}
 
-func getFavoritedCount(objectId int64) int64 {
+func getFavoritedCount(objectId int64) (int64, error) {
 	return repo.NewFavoriteDaoInstance().GetCountByObjectId(objectId, "video")
+}
+
+func getFavoriteCount(subjectId int64) (int64, error) {
+	return repo.NewFavoriteDaoInstance().GetCountBySubjectId(subjectId, "video")
 }

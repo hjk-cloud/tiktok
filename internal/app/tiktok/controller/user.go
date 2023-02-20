@@ -7,13 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 type UserInfoResponse struct {
 	vo.Response
-	UserInfo do.UserInfo `json:"user"`
+	UserInfo vo.User `json:"user"`
 }
 
 func UserInfo(c *gin.Context) {
@@ -25,7 +24,7 @@ func UserInfo(c *gin.Context) {
 	if user, err := service.GetUserInfo(r); err == nil {
 		c.JSON(http.StatusOK, UserInfoResponse{
 			Response: vo.Response{StatusCode: 0},
-			UserInfo: *user,
+			UserInfo: user,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserInfoResponse{

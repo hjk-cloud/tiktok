@@ -20,7 +20,7 @@ func NewFollowDaoInstance() *FollowDao {
 	return followDao
 }
 
-func (*FollowDao) QueryFollowStatus(follow *do.Follow) bool {
+func (*FollowDao) QueryFollowStatus(follow do.Follow) bool {
 	result := Db.Where("subject_id = ? AND object_id = ?", follow.SubjectId, follow.ObjectId).Take(&follow)
 	return result.RowsAffected == 1
 }
@@ -39,6 +39,22 @@ func (*FollowDao) GetCountBySubjectId(subjectId int64) (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (*FollowDao) GetFollowerList(objectId int64) ([]do.Follow, error) {
+	var followerList []do.Follow
+	if err := Db.Where("object_id = ? AND is_deleted = 0", objectId).Find(&followerList).Error; err != nil {
+		return nil, err
+	}
+	return followerList, nil
+}
+
+func (*FollowDao) GetFollowList(subjectId int64) ([]do.Follow, error) {
+	var followList []do.Follow
+	if err := Db.Where("subject_id = ? AND is_deleted = 0", subjectId).Find(&followList).Error; err != nil {
+		return nil, err
+	}
+	return followList, nil
 }
 
 func (*FollowDao) Insert(follow *do.Follow) error {

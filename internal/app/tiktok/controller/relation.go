@@ -16,7 +16,6 @@ type UserListResponse struct {
 	UserList []vo.User `json:"user_list"`
 }
 
-// RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
 	token := c.Query("token")
 	toUserIdString := c.Query("to_user_id")
@@ -31,27 +30,42 @@ func RelationAction(c *gin.Context) {
 	}
 }
 
-// FollowList all users have same follow list
 func FollowList(c *gin.Context) {
-	c.JSON(http.StatusOK, UserListResponse{
-		Response: vo.Response{
-			StatusCode: 0,
-		},
-		UserList: []vo.User{DemoUser},
-	})
+	userIdString := c.Query("user_id")
+	token := c.Query("token")
+	userId, _ := strconv.ParseInt(userIdString, 10, 64)
+
+	r := &dto.FollowRelationDTO{UserId: userId, Token: token}
+	if userList, err := service.GetFollowList(r); err != nil {
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
+	} else {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: vo.Response{
+				StatusCode: 0,
+			},
+			UserList: userList,
+		})
+	}
 }
 
-// FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
-	c.JSON(http.StatusOK, UserListResponse{
-		Response: vo.Response{
-			StatusCode: 0,
-		},
-		UserList: []vo.User{DemoUser},
-	})
+	userIdString := c.Query("user_id")
+	token := c.Query("token")
+	userId, _ := strconv.ParseInt(userIdString, 10, 64)
+
+	r := &dto.FollowRelationDTO{UserId: userId, Token: token}
+	if userList, err := service.GetFollowerList(r); err != nil {
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
+	} else {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: vo.Response{
+				StatusCode: 0,
+			},
+			UserList: userList,
+		})
+	}
 }
 
-// FriendList all users have same friend list
 func FriendList(c *gin.Context) {
 	token := c.Query("token")
 	userId, err := util.JWTAuth(token)

@@ -31,10 +31,16 @@ type User struct {
 	IsFollow        bool   `json:"is_follow,omitempty"`
 	Avatar          string
 	BackgroundImage string
+	Signature       string
 	signature       string
 	TotalFavorited  int64
 	WorkCount       int64
 	FavoriteCount   int64
+}
+
+type UserAuth struct {
+	UserId int64
+	Token  string
 }
 
 // 接口文档有问题，先自行调整

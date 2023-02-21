@@ -34,7 +34,6 @@ func UserRegister(r *dto.UserAuthDTO) (*vo.UserAuth, error) {
 		Name:     r.Username,
 		Password: password,
 	}
-
 	if err := userDao.Register(user); err != nil {
 		return nil, err
 	}

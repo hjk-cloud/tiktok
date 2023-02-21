@@ -5,6 +5,7 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
+	"github.com/hjk-cloud/tiktok/util"
 	"log"
 	"time"
 )
@@ -25,19 +26,25 @@ func NewFeedListFlow(token string, latestTime int64) *FeedService {
 	return &FeedService{Token: token, LatestTime: latestTime}
 }
 
-/**
+/*
+*
 0. 校验参数
 1. 获取一组video
 2. model的video需要映射到common的video，所有的video里userid要映射到user类，并加载到video类里
 3. 获取nextTime
 */
+// 全写在Do()过于臃肿，后续有空将函数拆开
+func (f *FeedService) validateParams() {
+}
 
 func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 	// 0. 如果时间戳超过当前时间，则等于当前时间
 	if f.LatestTime > time.Now().Unix() {
 		f.LatestTime = time.Now().Unix()
 	}
-	//fmt.Println("@@@@@Read Time: ", f.LatestTime)
+	// token校验，并获取本账户ID
+	fmt.Println("@@@@@token: " + f.Token)
+	userId, err := util.JWTAuth(f.Token)
 
 	// 1.
 	lt := time.Unix(f.LatestTime, 0)
@@ -52,37 +59,39 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 		video := videos[i]
 		//2.2 获取视频作者信息
 		var userInfoDao *repository.UserInfoDao
-		var userVO vo.User
-
-		user, err := userInfoDao.QueryUserById(video.AuthorId)
+		var authorVO vo.User
+		author, err := userInfoDao.QueryUserById(video.AuthorId)
 		if err != nil {
 			log.Print(err)
 		}
-		// 若user为空，则无此用户，Video内部User赋空值
-		if user != nil {
-			userVO = vo.User{
-				Id:            user.Id,
-				Name:          user.Name,
-				FollowCount:   user.FollowCount,
-				FollowerCount: user.FollowerCount,
+		// 若user不为空，则赋值
+		if author != nil {
+			fmt.Println("@@@@@@userId: ", userId)
+			authorVO = vo.User{
+				Id:            author.Id,
+				Name:          author.Name,
+				FollowCount:   author.FollowCount,
+				FollowerCount: author.FollowerCount,
 				// [TO DO] 需要关注接口
-				IsFollow: false,
+				IsFollow: GetFollowStatus(userId, author.Id),
 			}
 		}
-		log.Println(userVO)
-
+		log.Println(authorVO)
+		fmt.Println("userId, author.Id: ", userId, author.Id)
+		isFavorite := GetFavoriteStatus(userId, author.Id)
+		fmt.Println("@@@@@isFavorite: ", isFavorite)
 		// 2.3 映射视频VO信息
 		var videoFlow vo.VideoVO
 		videoFlow = vo.VideoVO{
 			Id:     video.Id,
-			Author: userVO,
+			Author: authorVO,
 			//Author:        repository.DemoUser,
 			PlayUrl:       video.PlayUrl,
 			CoverUrl:      video.CoverUrl,
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
 			// [TO DO]: 默认值，需要识别用户+是否点赞service
-			IsFavorite: false,
+			IsFavorite: isFavorite,
 		}
 		// 2.4
 		videoFlows = append(videoFlows, videoFlow)

@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -48,6 +49,7 @@ func FollowList(c *gin.Context) {
 	}
 }
 
+// 粉丝列表
 func FollowerList(c *gin.Context) {
 	userIdString := c.Query("user_id")
 	token := c.Query("token")
@@ -66,23 +68,27 @@ func FollowerList(c *gin.Context) {
 	}
 }
 
+// 好友列表：已关注
 func FriendList(c *gin.Context) {
 	token := c.Query("token")
+	userIdStr := c.Query("user_id")
 	userId, err := util.JWTAuth(token)
+	log.Printf("##### %s %s %d\n", userIdStr, token, userId)
 	if err != nil {
 		writeError(c, err)
 		return
 	}
-	var userList []vo.User
-	if userId == DemoUser.Id {
-		userList = []vo.User{DemoUser, ToDemoUser}
+	// var userList []vo.User
+	r := &dto.FollowRelationDTO{UserId: userId, Token: token}
+	if userList, err := service.GetFollowList(r); err != nil {
+		// c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
+		writeError(c, err)
 	} else {
-		userList = []vo.User{ToDemoUser, DemoUser}
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: vo.Response{
+				StatusCode: 0,
+			},
+			UserList: userList,
+		})
 	}
-	c.JSON(http.StatusOK, UserListResponse{
-		Response: vo.Response{
-			StatusCode: 0,
-		},
-		UserList: userList,
-	})
 }

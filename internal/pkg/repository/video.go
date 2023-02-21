@@ -51,19 +51,21 @@ func NewVideoRepoInstance() *VideoRepo {
 
 // 奇怪:太短
 func (*VideoRepo) Create(video *(do.VideoDO)) (int64, error) {
-	// fmt.Println("#####", video.TableName())
+	// log.Println("#####", video.TableName())
 	// gdb = NewGormDB()
 	err := Db.Create(video).Error
 	return video.Id, err
 }
 
-func (*VideoRepo) ExistUidHash(userid int64, hash string) bool {
-	// fmt.Println("#####", userid, hash)
+func (*VideoRepo) ExistUidHash(userId int64, hash string) bool {
+	log.Println("#####", userId, hash)
 	// gdb = NewGormDB()
-	var video *do.VideoDO
-	result := Db.Where(&do.VideoDO{AuthorId: userid, HashValue: hash}, // , Status: 0
-		map[string]interface{}{"Status": 0}).Find(video)
-	// fmt.Println(result)
+	// var video *do.VideoDO
+	result := Db.Where(&do.VideoDO{AuthorId: userId, HashValue: hash}, // , Status: 0
+		map[string]interface{}{"Status": 0}).First(&do.VideoDO{})
+	log.Printf("##### %#v\n", result)
+	log.Printf("##### %#v\n", result.Error)
+	log.Printf("##### %#v\n", errors.Is(nil, gorm.ErrRecordNotFound))
 	return !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hjk-cloud/tiktok/config"
+	_ "github.com/hjk-cloud/tiktok/config"
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/controller"
 )
 
 func initRouter(r *gin.Engine) {
 	// public directory is used to serve static resources
-	r.Static("/static", config.Config.StaticDir)
+	// r.Static("/static", config.Config.StaticDir)
 
 	apiRouter := r.Group("/douyin")
 

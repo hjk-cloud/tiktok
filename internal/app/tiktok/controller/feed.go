@@ -18,7 +18,7 @@ type FeedResponse struct {
 
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
-	var token string
+	token := c.Query("token")
 	var latestTime int64
 	// 获取请求参数的时间
 	times, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)

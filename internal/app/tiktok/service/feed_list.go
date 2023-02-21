@@ -60,13 +60,14 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 		//2.2 获取视频作者信息
 		var userInfoDao *repository.UserInfoDao
 		var authorVO vo.User
+		var isFavorite bool
+
 		author, err := userInfoDao.QueryUserById(video.AuthorId)
 		if err != nil {
 			log.Print(err)
 		}
 		// 若user不为空，则赋值
 		if author != nil {
-			fmt.Println("@@@@@@userId: ", userId)
 			authorVO = vo.User{
 				Id:            author.Id,
 				Name:          author.Name,
@@ -75,11 +76,10 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 				// [TO DO] 需要关注接口
 				IsFollow: GetFollowStatus(userId, author.Id),
 			}
+			// 需要在author不为空的时候赋值，否则author.Id会报空指针异常
+			isFavorite = GetFavoriteStatus(userId, author.Id)
 		}
-		log.Println(authorVO)
-		fmt.Println("userId, author.Id: ", userId, author.Id)
-		isFavorite := GetFavoriteStatus(userId, author.Id)
-		fmt.Println("@@@@@isFavorite: ", isFavorite)
+
 		// 2.3 映射视频VO信息
 		var videoFlow vo.VideoVO
 		videoFlow = vo.VideoVO{

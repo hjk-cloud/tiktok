@@ -2,8 +2,10 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
 )
@@ -29,19 +31,23 @@ func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {
 	return nil
 }
 
-//func GetFavoriteList(r *dto.FavoriteListDTO) (_, error) {
-//
-//	userId, err := util.JWTAuth(r.Token)
-//	if err != nil {
-//		return nil, errors.New("User doesn't exist")
-//	}
-//
-//}
+func GetFavoriteList(r *dto.FavoriteListDTO) ([]vo.Video, error) {
+
+	userId, err := util.JWTAuth(r.Token)
+	if err != nil {
+		return nil, errors.New("User doesn't exist")
+	}
+	favoriteList, err := repo.NewFavoriteDaoInstance().GetListBySubjectId(userId, "video")
+	if err != nil {
+		return nil, err
+	}
+	//TODO queryVideoVOListByBatchId
+	fmt.Println(favoriteList)
+	var videoVOList []vo.Video
+
+	return videoVOList, nil
+}
 
 func getFavoritedCount(objectId int64) (int64, error) {
 	return repo.NewFavoriteDaoInstance().GetCountByObjectId(objectId, "video")
-}
-
-func getFavoriteCount(subjectId int64) (int64, error) {
-	return repo.NewFavoriteDaoInstance().GetCountBySubjectId(subjectId, "video")
 }

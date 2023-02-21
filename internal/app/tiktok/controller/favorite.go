@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
-	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"net/http"
 	"strconv"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
-// FavoriteAction no practical effect, just check if token is valid
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
 	videoIdString := c.Query("video_id")
@@ -28,12 +26,20 @@ func FavoriteAction(c *gin.Context) {
 	}
 }
 
-// FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: vo.Response{
-			StatusCode: 0,
-		},
-		VideoList: repository.DemoVideos,
-	})
+	token := c.Query("token")
+	userIdString := c.Query("user_id")
+	userId, _ := strconv.ParseInt(userIdString, 10, 64)
+	r := &dto.FavoriteListDTO{Token: token, UserId: userId}
+	if videoList, err := service.GetFavoriteList(r); err != nil {
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
+	} else {
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: vo.Response{
+				StatusCode: 0,
+			},
+			VideoList: videoList,
+		})
+
+	}
 }

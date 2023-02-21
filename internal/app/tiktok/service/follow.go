@@ -24,10 +24,13 @@ func UpdateFollowStatus(r *dto.FollowActionDTO) error {
 		follow.SubjectId = userId
 	}
 	followDao := repo.NewFollowDaoInstance()
+	userDao := repo.NewUserInfoDaoInstance()
 	if r.ActionType {
 		followDao.Insert(follow)
+		userDao.Add(follow.SubjectId, "favorite_count")
 	} else {
 		followDao.Delete(follow)
+		userDao.Remove(follow.SubjectId, "favorite_count")
 	}
 	return nil
 }
@@ -57,16 +60,37 @@ func GetFollowerList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	}
 
 	followDao := repo.NewFollowDaoInstance()
-	followList, err := followDao.GetFollowerList(r.UserId)
-	if len(followList) == 0 {
+	followerList, err := followDao.GetFollowerList(r.UserId)
+	if len(followerList) == 0 {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	user := make([]vo.User, len(followList))
-	for i := range followList {
-		user[i], err = getUserInfoById(followList[i].SubjectId, userId)
+	user := make([]vo.User, len(followerList))
+	for i := range followerList {
+		user[i], err = getUserInfoById(followerList[i].SubjectId, userId)
+	}
+	return user, nil
+}
+
+func GetFriendList(r *dto.FollowRelationDTO) ([]vo.User, error) {
+	userId, err := util.JWTAuth(r.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	followDao := repo.NewFollowDaoInstance()
+	followerList, err := followDao.GetFollowerList(r.UserId)
+	if len(followerList) == 0 {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	user := make([]vo.User, len(followerList))
+	for i := range followerList {
+		user[i], err = getUserInfoById(followerList[i].SubjectId, userId)
 	}
 	return user, nil
 }

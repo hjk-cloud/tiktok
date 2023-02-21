@@ -24,7 +24,7 @@ func PublishList(dto *dto.PublishListDTO) ([]vo.Video, error) {
 			FollowCount:   authorDo.FollowCount,
 			FollowerCount: authorDo.FollowerCount,
 			// IsFollow:      false, // TODO: 暂时不提供，可能并没有影响
-			IsFollow: GetFollowStatus(userId, authorId),
+			IsFollow: getFollowStatus(userId, authorId),
 		}
 	}
 

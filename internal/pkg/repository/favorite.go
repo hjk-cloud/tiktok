@@ -43,7 +43,7 @@ func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int
 
 func (*FavoriteDao) GetListBySubjectId(subjectId int64, objectType string) ([]do.Favorite, error) {
 	var favoriteList []do.Favorite
-	if err := Db.Where("subject_id = ? AND objectType = ?", subjectId, objectType).Find(&favoriteList).Error; err != nil {
+	if err := Db.Where("subject_id = ? AND object_type = ?", subjectId, objectType).Find(&favoriteList).Error; err != nil {
 		return nil, err
 	}
 	return favoriteList, nil

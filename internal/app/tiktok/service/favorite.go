@@ -47,7 +47,3 @@ func GetFavoriteList(r *dto.FavoriteListDTO) ([]vo.Video, error) {
 
 	return videoVOList, nil
 }
-
-func getFavoritedCount(objectId int64) (int64, error) {
-	return repo.NewFavoriteDaoInstance().GetCountByObjectId(objectId, "video")
-}

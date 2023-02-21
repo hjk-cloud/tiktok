@@ -74,7 +74,7 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 				FollowCount:   author.FollowCount,
 				FollowerCount: author.FollowerCount,
 				// [TO DO] 需要关注接口
-				IsFollow: GetFollowStatus(userId, author.Id),
+				IsFollow: getFollowStatus(userId, author.Id),
 			}
 			// 需要在author不为空的时候赋值，否则author.Id会报空指针异常
 			isFavorite = GetFavoriteStatus(userId, author.Id)

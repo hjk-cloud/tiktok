@@ -178,8 +178,8 @@ func checkVideo(video *do.VideoDO, localVideoPath string) error {
 	}
 	// 2.3 检查视频重复 哈希值
 	// TODO：为了测试方便，暂时关闭
-	// if repo.NewVideoRepoInstance().GExistUidHash(video.AuthorId, video.HashValue) {
-	// 	return errors.New("请不要重复发表同一视频！")
-	// }
+	if repo.NewVideoRepoInstance().ExistUidHash(video.AuthorId, video.HashValue) {
+		return errors.New("请不要重复发表同一视频！")
+	}
 	return nil
 }

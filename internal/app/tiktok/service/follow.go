@@ -8,7 +8,10 @@ import (
 	"github.com/hjk-cloud/tiktok/util"
 )
 
-func GetFollowStatus(subjectId, objectId int64) bool {
+func getFollowStatus(subjectId, objectId int64) bool {
+	if subjectId == objectId {
+		return false
+	}
 	follow := do.Follow{SubjectId: subjectId, ObjectId: objectId}
 	return repo.NewFollowDaoInstance().QueryFollowStatus(follow)
 }
@@ -18,7 +21,7 @@ func UpdateFollowStatus(r *dto.FollowActionDTO) error {
 	if userId, err := util.JWTAuth(r.Token); err != nil {
 		return err
 	} else {
-		follow.ObjectId = userId
+		follow.SubjectId = userId
 	}
 	followDao := repo.NewFollowDaoInstance()
 	if r.ActionType {
@@ -36,11 +39,11 @@ func GetFollowList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	}
 
 	followDao := repo.NewFollowDaoInstance()
-	followList, err := followDao.GetFollowList(r.UserId)
+	followList, err := followDao.GetFollowList(userId)
 	if err != nil {
 		return nil, err
 	}
-	var user []vo.User
+	user := make([]vo.User, len(followList))
 	for i := range followList {
 		user[i], err = getUserInfoById(userId, followList[i].ObjectId)
 	}
@@ -55,28 +58,15 @@ func GetFollowerList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 
 	followDao := repo.NewFollowDaoInstance()
 	followList, err := followDao.GetFollowerList(r.UserId)
+	if len(followList) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
-	var user []vo.User
+	user := make([]vo.User, len(followList))
 	for i := range followList {
 		user[i], err = getUserInfoById(followList[i].SubjectId, userId)
 	}
 	return user, nil
-}
-
-func getFollowCount(subjectId int64) (int64, error) {
-	if count, err := repo.NewFollowDaoInstance().GetCountBySubjectId(subjectId); err != nil {
-		return 0, err
-	} else {
-		return count, nil
-	}
-}
-
-func getFollowerCount(objectId int64) (int64, error) {
-	if count, err := repo.NewFollowDaoInstance().GetCountByObjectId(objectId); err != nil {
-		return 0, err
-	} else {
-		return count, nil
-	}
 }

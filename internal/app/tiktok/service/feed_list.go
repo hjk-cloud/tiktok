@@ -73,7 +73,7 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 				FollowCount:   author.FollowCount,
 				FollowerCount: author.FollowerCount,
 				// [TO DO] 需要关注接口
-				IsFollow: GetFollowStatus(userId, author.Id),
+				IsFollow: getFollowStatus(userId, author.Id),
 			}
 		}
 		log.Println(authorVO)

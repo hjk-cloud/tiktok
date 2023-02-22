@@ -18,7 +18,7 @@ type FeedService struct {
 }
 
 // QueryFeedList Service层接口，将视频列表返回controller
-func QueryFeedList(token string, latestTime int64) ([]vo.VideoVO, int64, error) {
+func QueryFeedList(token string, latestTime int64) ([]vo.Video, int64, error) {
 	return NewFeedListFlow(token, latestTime).Do()
 }
 
@@ -37,7 +37,7 @@ func NewFeedListFlow(token string, latestTime int64) *FeedService {
 func (f *FeedService) validateParams() {
 }
 
-func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
+func (f *FeedService) Do() ([]vo.Video, int64, error) {
 	// 0. 如果时间戳超过当前时间，则等于当前时间
 	if f.LatestTime > time.Now().Unix() {
 		f.LatestTime = time.Now().Unix()
@@ -53,7 +53,7 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 		log.Print(err)
 	}
 	// 2.
-	var videoFlows []vo.VideoVO
+	var videoFlows []vo.Video
 	for i := 0; i < len(videos); i++ {
 		// 2.1 遍历视频列表
 		video := videos[i]
@@ -68,21 +68,25 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 		}
 		// 若user不为空，则赋值
 		if author != nil {
-			authorVO = vo.User{
-				Id:            author.Id,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				// [TO DO] 需要关注接口
-				IsFollow: getFollowStatus(userId, author.Id),
+			authorVO, err = getUserInfoById(userId, author.Id)
+			if err != nil {
+				log.Print(err)
 			}
+			//authorVO = vo.User{
+			//	Id:            author.Id,
+			//	Name:          author.Name,
+			//	FollowCount:   author.FollowCount,
+			//	FollowerCount: author.FollowerCount,
+			//	// [TO DO] 需要关注接口
+			//	IsFollow: getFollowStatus(userId, author.Id),
+			//}
 			// 需要在author不为空的时候赋值，否则author.Id会报空指针异常
 			isFavorite = GetFavoriteStatus(userId, author.Id)
 		}
 
 		// 2.3 映射视频VO信息
-		var videoFlow vo.VideoVO
-		videoFlow = vo.VideoVO{
+		var videoFlow vo.Video
+		videoFlow = vo.Video{
 			Id:     video.Id,
 			Author: authorVO,
 			//Author:        repository.DemoUser,
@@ -92,6 +96,7 @@ func (f *FeedService) Do() ([]vo.VideoVO, int64, error) {
 			CommentCount:  video.CommentCount,
 			// [TO DO]: 默认值，需要识别用户+是否点赞service
 			IsFavorite: isFavorite,
+			Title:      video.Title,
 		}
 		// 2.4
 		videoFlows = append(videoFlows, videoFlow)

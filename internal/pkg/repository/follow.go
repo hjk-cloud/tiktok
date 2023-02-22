@@ -57,12 +57,6 @@ func (*FollowDao) GetFollowList(subjectId int64) ([]do.Follow, error) {
 	return followList, nil
 }
 
-func (*FollowDao) GetFriendList(subjectId, objectId int64) ([]do.Follow, error) {
-	var followList []do.Follow
-	//TODO
-	return followList, nil
-}
-
 func (*FollowDao) Insert(follow *do.Follow) error {
 	if err := Db.Select("subject_id", "object_id").Create(follow).Error; err != nil {
 		return err
@@ -71,7 +65,7 @@ func (*FollowDao) Insert(follow *do.Follow) error {
 }
 
 func (*FollowDao) Delete(follow *do.Follow) error {
-	if err := Db.Model(follow).Update("is_deleted", 1).Error; err != nil {
+	if err := Db.Model(follow).Where("subject_id = ? AND object_id = ?", follow.SubjectId, follow.ObjectId).Update("is_deleted", 1).Error; err != nil {
 		return err
 	}
 	return nil

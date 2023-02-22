@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
@@ -41,9 +40,25 @@ func GetFavoriteList(r *dto.FavoriteListDTO) ([]vo.Video, error) {
 	if err != nil {
 		return nil, err
 	}
-	//TODO queryVideoVOListByBatchId
-	fmt.Println(favoriteList)
-	var videoVOList []vo.Video
+
+	videoVOList := make([]vo.Video, len(favoriteList))
+	for i := range favoriteList {
+		videoVOList[i], err = getFavoriteVideo(userId, favoriteList[i].ObjectId)
+	}
 
 	return videoVOList, nil
+}
+
+func getFavoriteVideo(userId int64, videoId int64) (vo.Video, error) {
+	video, err := repo.NewVideoRepoInstance().QueryVideoById(videoId)
+	if err != nil {
+		return vo.Video{}, err
+	}
+	videoVO := vo.Video{
+		Id:            video.Id,
+		CoverUrl:      video.CoverUrl,
+		FavoriteCount: video.FavoriteCount,
+		IsFavorite:    GetFavoriteStatus(userId, video.Id),
+	}
+	return videoVO, nil
 }

@@ -70,7 +70,7 @@ func (*VideoRepo) ExistUidHash(userId int64, hash string) bool {
 }
 
 // QueryVideoById 通过id查询单个video
-func (*VideoRepo) QueryVideoById(id int) (*do.VideoDO, error) {
+func (*VideoRepo) QueryVideoById(id int64) (*do.VideoDO, error) {
 	var video do.VideoDO
 	// 主要查询语句：查询单个元素语句，错误当场处理
 	err := Db.Where("id = ?", id).First(&video).Error

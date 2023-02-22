@@ -1,8 +1,11 @@
 package repository
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"log"
 	"sync"
+
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 type FollowDao struct {
@@ -69,4 +72,41 @@ func (*FollowDao) Delete(follow *do.Follow) error {
 		return err
 	}
 	return nil
+}
+
+// 好友列表
+func (*FollowDao) GetFriendList(userId int64) ([]vo.User, error) {
+	var users []vo.User
+	rows, err := Db.Raw(`
+SELECT 
+	c.id,
+	c.name,
+	c.follow_count,
+	c.follower_count,
+	0,
+	IF(c.avatar IS NULL, "", c.avatar),
+	IF(c.background IS NULL, "", c.background),
+	IF(c.signature IS NULL, "", c.signature),
+	c.total_favorited,
+	c.favorite_count,
+	c.publish_count
+FROM t_follow a
+INNER JOIN t_follow b ON a.object_id=b.subject_id
+INNER JOIN t_user_info c ON b.subject_id=c.Id AND a.is_deleted=0 AND b.is_deleted=0
+WHERE a.subject_id=? AND b.object_id=?;`, userId, userId).Rows()
+	if err != nil {
+		return nil, err
+	}
+	//.Scan(&videos).Error
+	for rows.Next() {
+		var user vo.User
+		err = rows.Scan(&user.Id, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow,
+			&user.Avatar, &user.BackgroundImage, &user.Signature, &user.TotalFavorited, &user.FavoriteCount, &user.WorkCount)
+		if err == nil {
+			users = append(users, user)
+		} else {
+			log.Printf("##### %#v\n", err)
+		}
+	}
+	return users, nil
 }

@@ -41,14 +41,11 @@ func MessageAction(c *gin.Context) {
 }
 
 // MessageChat all users have same follow list
-// 如此轮询，理解为聊天室功能
-// 且无法知道何时退出了聊天室
 func MessageChat(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
-	preMsgTime := c.Query("pre_msg_time") // 刚进窗口是0，后来是上次最新消息的时间（秒）
+	preMsgTime := c.Query("pre_msg_time") // 刚进窗口是0，后来是上次最新消息的时间（毫秒）
 	lastTime, err := strconv.ParseInt(preMsgTime, 10, 64)
-	log.Println("##### 时间转换", preMsgTime, lastTime)
 	// 秒是10位数, 毫秒是13位数。客户端传过来单位不一致？
 	// if lastTime < int64(math.Pow10(12)) {
 	// 	lastTime *= 1000

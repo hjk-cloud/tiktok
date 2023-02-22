@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"log"
 
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
@@ -24,6 +25,9 @@ func UpdateFollowStatus(r *dto.FollowActionDTO) error {
 		return err
 	} else {
 		follow.SubjectId = userId
+	}
+	if follow.SubjectId == follow.ObjectId {
+		return errors.New("不能关注自己")
 	}
 	followDao := repo.NewFollowDaoInstance()
 	userDao := repo.NewUserInfoDaoInstance()

@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 )
 
 type FeedResponse struct {
@@ -24,11 +25,11 @@ func Feed(c *gin.Context) {
 	times, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)
 	if err == nil {
 		// 1. 有参数，赋值
-		fmt.Println("times: ", times)
+		log.Println("times: ", times)
 		latestTime = times
 	} else {
 		// 2. 无参数，默认当前时间
-		fmt.Println(err)
+		log.Println(err)
 		latestTime = time.Now().Unix()
 	}
 	videos, nextTime, err := service.QueryFeedList(token, latestTime)

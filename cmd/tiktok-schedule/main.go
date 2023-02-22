@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	// 删除前days天的目录
-	days := time.Duration(1)
-	earliest := time.Now().Local().Add(-days * 24 * time.Hour)
+	// 删除前hours天的视频和封面所在的目录
+	hours := time.Duration(config.Config.TmpFileExpireHours)
+	earliest := time.Now().Add(-hours * time.Hour)
 	year, month, day := earliest.Year(), int(earliest.Month()), earliest.Day()
 	log.Println(config.Config.StaticDir, "###删到", year, month, day)
 
@@ -24,7 +24,6 @@ func main() {
 	}
 	// 所有年
 	for _, yf := range yfiles {
-		// log.Println(yf.Name())
 		y, err := strconv.Atoi(yf.Name())
 		if err != nil {
 			log.Println(err)
@@ -46,7 +45,6 @@ func main() {
 		}
 		// 所有月
 		for _, mf := range mfiles {
-			// log.Println(mf.Name())
 			m, err := strconv.Atoi(mf.Name())
 			if err != nil {
 				log.Println(err)
@@ -68,7 +66,6 @@ func main() {
 			}
 			// 所有日
 			for _, df := range dfiles {
-				// log.Println(mf.Name())
 				d, err := strconv.Atoi(df.Name())
 				if err != nil {
 					log.Println(err)
@@ -83,14 +80,4 @@ func main() {
 			}
 		}
 	}
-
-	// os.RemoveAll(dir)
-	// if err := os.MkdirAll(dir, 0755); err != nil {
-	// 	return "", "", err
-	// }
-	time.Sleep(30 * time.Second)
 }
-
-/*
-mkdir -p 2022/11/30 2022/12/1 2023/2/2 2023/2/3 2023/2/4 2023/2/5 2023/2/6 2023/2/7 2023/2/8 2023/2/9
-*/

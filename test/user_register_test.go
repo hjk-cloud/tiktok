@@ -2,9 +2,10 @@ package test
 
 import (
 	"encoding/base64"
-	"fmt"
-	"golang.org/x/crypto/argon2"
+	"log"
 	"testing"
+
+	"golang.org/x/crypto/argon2"
 )
 
 func TestRegister(t *testing.T) {
@@ -19,6 +20,6 @@ func TestRegister(t *testing.T) {
 	// 将key编码为base64字符串
 	data := base64.StdEncoding.EncodeToString(key)
 
-	fmt.Println(data)
-	fmt.Println(len(data))
+	log.Println(data)
+	log.Println(len(data))
 }

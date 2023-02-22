@@ -25,5 +25,5 @@ type MessageChatDTO struct {
 	Token      string
 	UserId     int64
 	ToUserId   int64
-	PreMsgTime int64 // 秒
+	PreMsgTime int64 // 毫秒
 }

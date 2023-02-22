@@ -12,28 +12,8 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 
-	//_ "github.com/spf13/viper" // 只执行init()
 	"gorm.io/gorm"
 )
-
-// TableName why？
-// type Video entity.Video
-
-// type Video struct {
-// 	entity.Video
-// }
-
-// func NewGormDB() *gorm.DB {
-// 	// sync.once
-// 	getConfig()
-// 	log.Println("#####", connLink)
-// 	db, err := gorm.Open(mysql.Open(connLink))
-// 	if err != nil {
-// 		log.Panicln(err)
-// 		// panic(err)
-// 	}
-// 	return db
-// }
 
 type VideoRepo struct {
 }
@@ -49,23 +29,15 @@ func NewVideoRepoInstance() *VideoRepo {
 	return videoRepo
 }
 
-// 奇怪:太短
 func (*VideoRepo) Create(video *(do.VideoDO)) (int64, error) {
-	// log.Println("#####", video.TableName())
-	// gdb = NewGormDB()
 	err := Db.Create(video).Error
 	return video.Id, err
 }
 
 func (*VideoRepo) ExistUidHash(userId int64, hash string) bool {
 	log.Println("#####", userId, hash)
-	// gdb = NewGormDB()
-	// var video *do.VideoDO
-	result := Db.Where(&do.VideoDO{AuthorId: userId, HashValue: hash}, // , Status: 0
+	result := Db.Where(&do.VideoDO{AuthorId: userId, HashValue: hash},
 		map[string]interface{}{"Status": 0}).First(&do.VideoDO{})
-	log.Printf("##### %#v\n", result)
-	log.Printf("##### %#v\n", result.Error)
-	log.Printf("##### %#v\n", errors.Is(nil, gorm.ErrRecordNotFound))
 	return !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
@@ -108,19 +80,6 @@ func (*VideoRepo) MQueryVideoByLastTime(latestTime time.Time) ([]do.VideoDO, err
 	return videos, nil
 }
 
-// authorId -> video
-// userId -> favorite(video)
-
-// 用户访问自己主页
-// func (*VideoRepo) QueryVideoByAuthorId(authorId int64) ([]do.VideoDO, error) {
-// 	var videos []do.VideoDO
-// 	err := Db.Where(do.VideoDO{AuthorId: authorId}, map[string]interface{}{"Status": 0}).Find(&videos).Error
-// 	if err == gorm.ErrRecordNotFound {
-// 		return videos, nil
-// 	}
-// 	return videos, err
-// }
-
 // 用户访问作者(也可能是用户本人)主页
 func (*VideoRepo) QueryVideoInProfile(userId int64, authorId int64) ([]vo.Video, error) {
 	var videos []vo.Video
@@ -132,7 +91,7 @@ func (*VideoRepo) QueryVideoInProfile(userId int64, authorId int64) ([]vo.Video,
 	if err != nil {
 		return nil, err
 	}
-	//.Scan(&videos).Error
+
 	for rows.Next() {
 		var video vo.Video
 		err = rows.Scan(&video.Id, &video.PlayUrl, &video.CoverUrl, &video.CommentCount, &video.FavoriteCount,

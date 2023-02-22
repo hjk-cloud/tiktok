@@ -1,13 +1,13 @@
 package util
 
 import (
-	"fmt"
+	"log"
 	"sync"
 	"time"
 )
 
 // 支持 2 ^ 8 - 1 台机器
-//每一个毫秒支持 2 ^ 9 - 1 个不同的id
+// 每一个毫秒支持 2 ^ 9 - 1 个不同的id
 const (
 	workerIdBitsMoveLen = uint(8)
 	maxWorkerId         = int64(-1 ^ (-1 << workerIdBitsMoveLen))
@@ -64,5 +64,5 @@ func testGetId() {
 	for i := 0; i < 100; i++ {
 		arr = append(arr, worker.GetId())
 	}
-	fmt.Printf("%+v\n", arr)
+	log.Printf("%+v\n", arr)
 }

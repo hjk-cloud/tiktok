@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -20,19 +21,7 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
-
-	"encoding/hex"
 )
-
-// type Video entity.Video
-// type PublishActionDTO struct {
-// 	dto.PublishActionDTO
-// 	UserId int64
-// }
-
-// func (p *dto.PublishActionDTO) Convert() *PublishActionDTO {
-// 	return &PublishActionDTO{p,""}
-//  }
 
 func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 	video := &do.VideoDO{Title: strings.TrimSpace(f.Title), FavoriteCount: 0, CommentCount: 0, Status: 0}
@@ -58,8 +47,7 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 		video.PlayUrl = playUrl
 	}
 
-	// CoverUrl
-	// 截取第 1 帧作为封面，与客户端保持一致
+	// CoverUrl: 截取第 1 帧作为封面，与客户端保持一致
 	vframe := 1
 	if coverUrl, _, err := getCoverUrl(localVideoPath, vframe); err != nil {
 		return -1, err
@@ -67,7 +55,7 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 		video.CoverUrl = coverUrl
 	}
 
-	video.CreateTime = time.Now().Local() // mysql设置的默认值用不到？
+	video.CreateTime = time.Now() // mysql设置的默认值用不到？
 	log.Printf("Video: %+v\n", video)
 	if err := checkVideo(video, localVideoPath); err != nil {
 		return -1, err
@@ -76,12 +64,12 @@ func PublishAction(f *dto.PublishActionDTO) (int64, error) {
 	if _, err := repo.NewVideoRepoInstance().Create(video); err != nil {
 		return -1, err
 	} else {
-		return video.Id, errors.New("已发布成功，为了方便测试故意Error")
+		return video.Id, nil
 	}
 }
 
 func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) (string, string, error) {
-	now := time.Now().Local()
+	now := time.Now()
 	ymdh := fmt.Sprintf("/%d/%d/%d/%d", now.Year(), now.Month(), now.Day(), now.Hour())
 	dir := config.Config.StaticDir + ymdh
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -96,10 +84,7 @@ func getPlayUrl(context *gin.Context, data *multipart.FileHeader, userId int64) 
 	}
 
 	videoPath := fmt.Sprintf("%s/%s", ymdh, finalName)
-
 	playUrl, err := util.Upload(saveFile, videoPath)
-
-	// log.Println(playUrl, videoPath)
 	return playUrl, videoPath, err
 }
 
@@ -121,11 +106,9 @@ func getHashValue(data *multipart.FileHeader) (string, error) {
 // 第一帧
 func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 	// 使用 ffmpeg 提取指定帧作为图像文件
-	// ffmpeg -i tiktok.mp4 -vframes 1 -f image2 cover-%03d.png
+	// ffmpeg -i tiktok.mp4 -vframes 1 -f image2 tiktok-cover.png
 	dotIdx := strings.LastIndex(videoPath, ".")
 	imgPath := videoPath[:dotIdx] + "-cover.png"
-	// log.Println("视频路径", config.STATIC_DIR+videoPath)
-	// log.Println("封面路径", config.STATIC_DIR+imgPath)
 	finalPath := config.Config.StaticDir + imgPath
 	cmd := exec.Command("ffmpeg", "-i", config.Config.StaticDir+videoPath, "-vframes", strconv.Itoa(frameNumber), "-f", "image2", finalPath)
 	if err := cmd.Run(); err != nil {
@@ -133,7 +116,6 @@ func getCoverUrl(videoPath string, frameNumber int) (string, string, error) {
 		return "", imgPath, err
 	}
 	coverUrl, err := util.Upload(finalPath, imgPath)
-	// log.Println(coverUrl, imgPath)
 	return coverUrl, imgPath, err
 }
 
@@ -177,7 +159,6 @@ func checkVideo(video *do.VideoDO, localVideoPath string) error {
 		return errors.New("video too long")
 	}
 	// 2.3 检查视频重复 哈希值
-	// TODO：为了测试方便，暂时关闭
 	if repo.NewVideoRepoInstance().ExistUidHash(video.AuthorId, video.HashValue) {
 		return errors.New("请不要重复发表同一视频！")
 	}

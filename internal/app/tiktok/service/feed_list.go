@@ -1,13 +1,13 @@
 package service
 
 import (
-	"fmt"
+	"log"
+	"time"
+
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	"github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
-	"log"
-	"time"
 )
 
 type FeedService struct {
@@ -43,7 +43,7 @@ func (f *FeedService) Do() ([]vo.Video, int64, error) {
 		f.LatestTime = time.Now().Unix()
 	}
 	// token校验，并获取本账户ID
-	fmt.Println("@@@@@token: " + f.Token)
+	log.Println("@@@@@token: " + f.Token)
 	userId, err := util.JWTAuth(f.Token)
 
 	// 1.
@@ -111,6 +111,6 @@ func (f *FeedService) Do() ([]vo.Video, int64, error) {
 		nextTime = time.Now()
 	}
 
-	fmt.Println("feed_list:75 | Next time:", nextTime, nextTime.Unix())
+	log.Println("feed_list:75 | Next time:", nextTime, nextTime.Unix())
 	return videoFlows, nextTime.Unix(), err
 }

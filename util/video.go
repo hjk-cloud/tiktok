@@ -22,7 +22,7 @@ type BoxHeader struct {
 // 	if err != nil {
 // 		panic(err)
 // 	}
-// 	fmt.Println(filepath.Base(localPath), duration)
+// 	log.Println(filepath.Base(localPath), duration)
 // 	return duration, nil
 // }
 

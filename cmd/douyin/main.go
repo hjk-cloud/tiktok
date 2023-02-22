@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"time"
 )
 
 func main() {
-	fmt.Println("Hello, world!################################################################")
+	log.Println("Hello, world!################################################################")
 	time.Sleep(10 * time.Second)
 }

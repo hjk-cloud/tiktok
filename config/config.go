@@ -21,8 +21,8 @@ type ConfigStruct struct {
 		Username string
 		Password string
 	}
-	StaticDir string
-	// ChatPollingInterval int
+	StaticDir          string
+	TmpFileExpireHours int
 }
 
 var (
@@ -43,8 +43,7 @@ func LoadConfig(fileDir string) {
 	viper.SetConfigName("tiktok") //配置文件名
 	viper.SetConfigType("yaml")   //配置文件类型
 	viper.AddConfigPath(fileDir)  //执行go run对应的路径配置
-	//viper.AddConfigPath(workDir+"/src/gin_application"+"/config") //执行单文件运行，
-	log.Println(fileDir)
+	log.Println("配置文件目录", fileDir)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -54,25 +53,16 @@ func LoadConfig(fileDir string) {
 		}
 	}
 
-	allSettings := viper.AllSettings()
-	log.Println(allSettings)
+	// allSettings := viper.AllSettings()
+	// log.Println(allSettings)
 
 	err := viper.Unmarshal(&Config)
 	if err != nil {
 		log.Printf("Error unmarshalling config: %s", err)
 	}
-	log.Printf("%#v\n", Config)
+	// log.Printf("%#v\n", Config)
 
 	if err := os.MkdirAll(Config.StaticDir, 0755); err != nil {
 		log.Println("创建静态资源目录失败..")
 	}
 }
-
-// func LoadStruct() {
-// 	// var config Config
-// 	err := viper.Unmarshal(&Config)
-// 	if err != nil {
-// 		log.Printf("Error unmarshalling config: %s", err)
-// 	}
-// 	log.Println(Config)
-// }

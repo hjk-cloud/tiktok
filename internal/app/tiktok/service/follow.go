@@ -60,7 +60,7 @@ func GetFollowerList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	}
 
 	followDao := repo.NewFollowDaoInstance()
-	followerList, err := followDao.GetFollowerList(r.UserId)
+	followerList, err := followDao.GetFollowerList(userId)
 	if len(followerList) == 0 {
 		return nil, nil
 	}

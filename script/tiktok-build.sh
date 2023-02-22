@@ -1,5 +1,5 @@
 cd ../cmd/tiktok
 
-go build && ./tiktok
+go build
 
 cd ../../script

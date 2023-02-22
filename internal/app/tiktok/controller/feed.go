@@ -12,8 +12,8 @@ import (
 
 type FeedResponse struct {
 	vo.Response
-	VideoList []vo.VideoVO `json:"video_list,omitempty"`
-	NextTime  int64        `json:"next_time,omitempty"`
+	VideoList []vo.Video `json:"video_list,omitempty"`
+	NextTime  int64      `json:"next_time,omitempty"`
 }
 
 // Feed same demo video list for every request

@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
@@ -68,7 +69,7 @@ func FollowerList(c *gin.Context) {
 	}
 }
 
-// 好友列表：已关注
+// 好友列表：互相关注
 func FriendList(c *gin.Context) {
 	token := c.Query("token")
 	userIdStr := c.Query("user_id")
@@ -80,7 +81,7 @@ func FriendList(c *gin.Context) {
 	}
 	// var userList []vo.User
 	r := &dto.FollowRelationDTO{UserId: userId, Token: token}
-	if userList, err := service.GetFollowList(r); err != nil {
+	if userList, err := service.GetFriendList(r); err != nil {
 		// c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: err.Error()})
 		writeError(c, err)
 	} else {

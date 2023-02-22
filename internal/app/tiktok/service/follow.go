@@ -1,6 +1,8 @@
 package service
 
 import (
+	"log"
+
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
@@ -74,6 +76,7 @@ func GetFollowerList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	return user, nil
 }
 
+// 好友列表
 func GetFriendList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	userId, err := util.JWTAuth(r.Token)
 	if err != nil {
@@ -81,16 +84,13 @@ func GetFriendList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	}
 
 	followDao := repo.NewFollowDaoInstance()
-	followerList, err := followDao.GetFollowerList(r.UserId)
-	if len(followerList) == 0 {
-		return nil, nil
-	}
+	friends, err := followDao.GetFriendList(userId)
+	log.Printf("##### %#v\n", friends)
 	if err != nil {
 		return nil, err
 	}
-	user := make([]vo.User, len(followerList))
-	for i := range followerList {
-		user[i], err = getUserInfoById(followerList[i].SubjectId, userId)
-	}
-	return user, nil
+	user, err := getUserInfoById(userId, userId)
+	log.Printf("##### %#v\n", user)
+	// friends = append([]vo.User{user}, friends...)
+	return friends, err
 }

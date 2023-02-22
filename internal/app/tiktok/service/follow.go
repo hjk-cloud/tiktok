@@ -75,7 +75,7 @@ func GetFollowerList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	}
 	user := make([]vo.User, len(followerList))
 	for i := range followerList {
-		user[i], err = getUserInfoById(followerList[i].SubjectId, userId)
+		user[i], err = getUserInfoById(userId, followerList[i].SubjectId)
 	}
 	return user, nil
 }

@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"net/http"
 	"strconv"
+
+	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
@@ -16,6 +17,7 @@ func FavoriteAction(c *gin.Context) {
 	actionType := c.Query("action_type")
 	videoId, _ := strconv.ParseInt(videoIdString, 10, 64)
 	r := &dto.FavoriteActionDTO{Token: token, VideoId: videoId, ActionType: actionType == "1"}
+	// ActionType always true ？
 
 	if err := service.UpdateFavoriteStatus(r); err != nil {
 		c.JSON(http.StatusOK, UserInfoResponse{

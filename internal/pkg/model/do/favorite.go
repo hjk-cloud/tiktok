@@ -8,7 +8,7 @@ type Favorite struct {
 	ObjectType string
 	isDeleted  int8
 	CreateTime time.Time
-	updateTime time.Time
+	UpdateTime time.Time
 }
 
 func (Favorite) TableName() string {

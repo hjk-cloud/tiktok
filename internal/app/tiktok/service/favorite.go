@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"log"
+	"time"
 
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
@@ -17,7 +19,8 @@ func GetFavoriteStatus(subjectId, objectId int64) bool {
 }
 
 func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {
-	favorite := &do.Favorite{ObjectId: r.VideoId, ObjectType: "video"}
+	log.Printf("##### FavoriteActionDTO %#v\n", r)
+	favorite := &do.Favorite{ObjectId: r.VideoId, ObjectType: "video", CreateTime: time.Now(), UpdateTime: time.Now()}
 	if userId, err := util.JWTAuth(r.Token); err != nil {
 		return errors.New("User doesn't exist")
 	} else {
@@ -26,7 +29,6 @@ func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {
 	favoriteDao := repo.NewFavoriteDaoInstance()
 	if r.ActionType {
 		favoriteDao.Insert(favorite)
-		// TODO
 		repo.Db.Model(&do.VideoDO{Id: r.VideoId}).Update("favorite_count", gorm.Expr("favorite_count + 1"))
 	} else {
 		favoriteDao.Delete(favorite)

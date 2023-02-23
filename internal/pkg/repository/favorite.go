@@ -1,8 +1,10 @@
 package repository
 
 import (
-	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
 	"sync"
+
+	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"gorm.io/gorm/clause"
 )
 
 type FavoriteDao struct {
@@ -50,10 +52,17 @@ func (*FavoriteDao) GetListBySubjectId(subjectId int64, objectType string) ([]do
 }
 
 func (*FavoriteDao) Insert(favorite *do.Favorite) error {
-	if err := Db.Select("subject_id", "object_id", "object_type").Create(favorite).Error; err != nil {
-		return err
-	}
-	return nil
+	// Db.Clauses(clause.OnConflict{
+	// 	Columns:   []clause.Column{{Name: "subject_id"}, {Name: "object_id"}, {Name: "object_type"}},
+	// 	DoUpdates: clause.Assignments(map[string]interface{}{"is_deleted": 0}),
+	// }).Create(&favorite)
+	// if err := Db.Select("subject_id", "object_id", "object_type").Create(favorite).Error; err != nil {
+	// 	return err
+	// }
+	return Db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "subject_id"}, {Name: "object_id"}, {Name: "object_type"}},
+		DoUpdates: clause.Assignments(map[string]interface{}{"is_deleted": 0, "update_time": favorite.UpdateTime}),
+	}).Create(&favorite).Error
 }
 
 func (*FavoriteDao) Delete(favorite *do.Favorite) error {

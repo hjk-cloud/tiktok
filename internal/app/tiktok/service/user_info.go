@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
@@ -28,7 +29,7 @@ func GetUserInfo(r *dto.UserLoginDTO) (vo.User, error) {
 		FollowCount:     userInfo.FollowCount,
 		FollowerCount:   userInfo.FollowerCount,
 		IsFollow:        getFollowStatus(userId, r.UserId),
-		Avatar:          userInfo.Avatar,
+		Avatar:          defaultAvatar(userInfo.Avatar),
 		BackgroundImage: userInfo.Background,
 		Signature:       userInfo.Signature,
 		TotalFavorited:  userInfo.TotalFavorited,
@@ -52,7 +53,7 @@ func getUserInfoById(subjectId, objectId int64) (vo.User, error) {
 		FollowCount:     userInfo.FollowCount,
 		FollowerCount:   userInfo.FollowerCount,
 		IsFollow:        getFollowStatus(subjectId, objectId),
-		Avatar:          userInfo.Avatar,
+		Avatar:          defaultAvatar(userInfo.Avatar),
 		BackgroundImage: userInfo.Background,
 		Signature:       userInfo.Signature,
 		TotalFavorited:  userInfo.TotalFavorited,
@@ -60,4 +61,12 @@ func getUserInfoById(subjectId, objectId int64) (vo.User, error) {
 		WorkCount:       userInfo.PublishCount,
 	}
 	return user, nil
+}
+
+func defaultAvatar(avatar string) string {
+	return "http://www.hummingg.com/images/01cat.png"
+	// if avatar == "" {
+	// 	return "http://www.hummingg.com/images/01cat.png"
+	// }
+	// return avatar
 }

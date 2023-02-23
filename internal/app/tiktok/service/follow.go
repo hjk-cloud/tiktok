@@ -98,5 +98,8 @@ func GetFriendList(r *dto.FollowRelationDTO) ([]vo.User, error) {
 	user, err := getUserInfoById(userId, userId)
 	log.Printf("##### %#v\n", user)
 	// friends = append([]vo.User{user}, friends...)
+	for i := range friends {
+		friends[i].Avatar = defaultAvatar(friends[i].Avatar)
+	}
 	return friends, err
 }

@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/do"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -29,7 +31,7 @@ func (*FavoriteDao) QueryFavoriteStatus(favorite *do.Favorite) bool {
 
 func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) (int64, error) {
 	var count int64
-	if err := Db.Model(&favorite).Where("object_id = ? AND object_type = ? AND is_deleted = 0", objectId, objectType).Count(&count).Error; err != nil {
+	if err := Db.Model(&do.Favorite{}).Where("object_id = ? AND object_type = ? AND is_deleted = 0", objectId, objectType).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
@@ -37,7 +39,7 @@ func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) (int64
 
 func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int64, error) {
 	var count int64
-	if err := Db.Model(&favorite).Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Count(&count).Error; err != nil {
+	if err := Db.Model(&do.Favorite{}).Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
@@ -45,7 +47,7 @@ func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int
 
 func (*FavoriteDao) GetListBySubjectId(subjectId int64, objectType string) ([]do.Favorite, error) {
 	var favoriteList []do.Favorite
-	if err := Db.Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Find(&favoriteList).Error; err != nil {
+	if err := Db.Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Find(&favoriteList).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
 	return favoriteList, nil
@@ -66,7 +68,12 @@ func (*FavoriteDao) Insert(favorite *do.Favorite) error {
 }
 
 func (*FavoriteDao) Delete(favorite *do.Favorite) error {
-	if err := Db.Model(favorite).Update("is_deleted", 1).Error; err != nil {
+	// Model报错
+	if err := Db.Model(&do.Favorite{}).Where(&do.Favorite{
+		SubjectId:  favorite.SubjectId,
+		ObjectId:   favorite.ObjectId,
+		ObjectType: favorite.ObjectType,
+	}).Update("is_deleted", 1).Error; err != nil {
 		return err
 	}
 	return nil

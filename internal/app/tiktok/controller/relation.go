@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/hjk-cloud/tiktok/internal/app/tiktok/service"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/dto"
-
-	"github.com/gin-gonic/gin"
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	"github.com/hjk-cloud/tiktok/util"
 )

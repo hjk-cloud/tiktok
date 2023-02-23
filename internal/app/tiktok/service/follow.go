@@ -33,10 +33,12 @@ func UpdateFollowStatus(r *dto.FollowActionDTO) error {
 	userDao := repo.NewUserInfoDaoInstance()
 	if r.ActionType {
 		followDao.Insert(follow)
-		userDao.Add(follow.SubjectId, "favorite_count")
+		userDao.Add(follow.SubjectId, "follow_count")
+		userDao.Add(follow.ObjectId, "follower_count")
 	} else {
 		followDao.Delete(follow)
-		userDao.Remove(follow.SubjectId, "favorite_count")
+		userDao.Remove(follow.SubjectId, "follow_count")
+		userDao.Remove(follow.ObjectId, "follower_count")
 	}
 	return nil
 }

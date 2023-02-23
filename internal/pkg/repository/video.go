@@ -104,3 +104,25 @@ func (*VideoRepo) QueryVideoInProfile(userId int64, authorId int64) ([]vo.Video,
 	}
 	return videos, rows.Err()
 }
+
+func (*VideoRepo) Add(id int64, column string) error {
+	var video vo.Video
+	if err := Db.Where("id = ?", id).Take(&video).Error; err != nil {
+		return err
+	}
+	if err := Db.Model(video).UpdateColumn(column, gorm.Expr(column+" + 1")).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (*VideoRepo) Remove(id int64, column string) error {
+	var video vo.Video
+	if err := Db.Where("id = ?", id).Take(&video).Error; err != nil {
+		return err
+	}
+	if err := Db.Model(video).UpdateColumn(column, gorm.Expr(column+" - 1")).Error; err != nil {
+		return err
+	}
+	return nil
+}

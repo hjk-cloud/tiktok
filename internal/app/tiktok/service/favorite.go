@@ -10,7 +10,6 @@ import (
 	"github.com/hjk-cloud/tiktok/internal/pkg/model/vo"
 	repo "github.com/hjk-cloud/tiktok/internal/pkg/repository"
 	"github.com/hjk-cloud/tiktok/util"
-	"gorm.io/gorm"
 )
 
 func GetFavoriteStatus(subjectId, objectId int64) bool {
@@ -26,13 +25,20 @@ func UpdateFavoriteStatus(r *dto.FavoriteActionDTO) error {
 	} else {
 		favorite.SubjectId = userId
 	}
+	video, _ := repo.NewVideoRepoInstance().QueryVideoById(r.VideoId)
 	favoriteDao := repo.NewFavoriteDaoInstance()
+	userDao := repo.NewUserInfoDaoInstance()
+	videoDao := repo.NewVideoRepoInstance()
 	if r.ActionType {
 		favoriteDao.Insert(favorite)
-		repo.Db.Model(&do.VideoDO{Id: r.VideoId}).Update("favorite_count", gorm.Expr("favorite_count + 1"))
+		userDao.Add(favorite.SubjectId, "favorite_count")
+		userDao.Add(video.AuthorId, "total_favorited")
+		videoDao.Add(video.Id, "favorite_count")
 	} else {
 		favoriteDao.Delete(favorite)
-		repo.Db.Model(&do.VideoDO{Id: r.VideoId}).Update("favorite_count", gorm.Expr("favorite_count - 1"))
+		userDao.Remove(favorite.SubjectId, "favorite_count")
+		userDao.Remove(video.AuthorId, "total_favorited")
+		videoDao.Remove(video.Id, "favorite_count")
 	}
 	return nil
 }

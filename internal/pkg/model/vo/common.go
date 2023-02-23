@@ -29,13 +29,12 @@ type User struct {
 	FollowCount     int64  `json:"follow_count,omitempty"`
 	FollowerCount   int64  `json:"follower_count,omitempty"`
 	IsFollow        bool   `json:"is_follow,omitempty"`
-	Avatar          string
-	BackgroundImage string
-	Signature       string
-	signature       string
-	TotalFavorited  int64
-	WorkCount       int64
-	FavoriteCount   int64
+	Avatar          string `json:"avatar,omitempty"`
+	BackgroundImage string `json:"background_image,omitempty"`
+	Signature       string `json:"signature,omitempty"`
+	TotalFavorited  int64  `json:"total_favorited,omitempty"`
+	WorkCount       int64  `json:"work_count,omitempty"`
+	FavoriteCount   int64  `json:"favorite_count,omitempty"`
 }
 
 type UserAuth struct {

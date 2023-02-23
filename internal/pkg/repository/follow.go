@@ -97,7 +97,6 @@ WHERE a.subject_id=? AND b.object_id=?;`, userId, userId).Rows()
 	if err != nil {
 		return nil, err
 	}
-	//.Scan(&videos).Error
 	for rows.Next() {
 		var user vo.User
 		err = rows.Scan(&user.Id, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow,

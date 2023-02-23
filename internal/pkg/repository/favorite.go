@@ -23,13 +23,13 @@ func NewFavoriteDaoInstance() *FavoriteDao {
 }
 
 func (*FavoriteDao) QueryFavoriteStatus(favorite *do.Favorite) bool {
-	result := Db.Where("subject_id = ? AND object_id = ? AND object_type = ?", favorite.SubjectId, favorite.ObjectId, favorite.ObjectType).Take(&favorite)
+	result := Db.Where("subject_id = ? AND object_id = ? AND object_type = ? AND is_deleted = 0", favorite.SubjectId, favorite.ObjectId, favorite.ObjectType).Take(&favorite)
 	return result.RowsAffected == 1
 }
 
 func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) (int64, error) {
 	var count int64
-	if err := Db.Model(&favorite).Where("object_id = ? AND object_type = ?", objectId, objectType).Count(&count).Error; err != nil {
+	if err := Db.Model(&favorite).Where("object_id = ? AND object_type = ? AND is_deleted = 0", objectId, objectType).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
@@ -37,7 +37,7 @@ func (*FavoriteDao) GetCountByObjectId(objectId int64, objectType string) (int64
 
 func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int64, error) {
 	var count int64
-	if err := Db.Model(&favorite).Where("subject_id = ? AND object_type = ?", subjectId, objectType).Count(&count).Error; err != nil {
+	if err := Db.Model(&favorite).Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
@@ -45,7 +45,7 @@ func (*FavoriteDao) GetCountBySubjectId(subjectId int64, objectType string) (int
 
 func (*FavoriteDao) GetListBySubjectId(subjectId int64, objectType string) ([]do.Favorite, error) {
 	var favoriteList []do.Favorite
-	if err := Db.Where("subject_id = ? AND object_type = ?", subjectId, objectType).Find(&favoriteList).Error; err != nil {
+	if err := Db.Where("subject_id = ? AND object_type = ? AND is_deleted = 0", subjectId, objectType).Find(&favoriteList).Error; err != nil {
 		return nil, err
 	}
 	return favoriteList, nil

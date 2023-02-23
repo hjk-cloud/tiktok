@@ -60,7 +60,7 @@ func (f *FeedService) Do() ([]vo.Video, int64, error) {
 		//2.2 获取视频作者信息
 		var userInfoDao *repository.UserInfoDao
 		var authorVO vo.User
-		var isFavorite bool
+		// var isFavorite bool
 
 		author, err := userInfoDao.QueryUserById(video.AuthorId)
 		if err != nil {
@@ -81,7 +81,7 @@ func (f *FeedService) Do() ([]vo.Video, int64, error) {
 			//	IsFollow: getFollowStatus(userId, author.Id),
 			//}
 			// 需要在author不为空的时候赋值，否则author.Id会报空指针异常
-			isFavorite = GetFavoriteStatus(userId, author.Id)
+			// isFavorite = GetFavoriteStatus(userId, author.Id)
 		}
 
 		// 2.3 映射视频VO信息
@@ -95,7 +95,7 @@ func (f *FeedService) Do() ([]vo.Video, int64, error) {
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
 			// [TO DO]: 默认值，需要识别用户+是否点赞service
-			IsFavorite: isFavorite,
+			IsFavorite: GetFavoriteStatus(userId, video.Id),
 			Title:      video.Title,
 		}
 		// 2.4
